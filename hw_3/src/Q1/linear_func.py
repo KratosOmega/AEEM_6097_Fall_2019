@@ -3,7 +3,7 @@ import numpy as np
 class Linear_Func():
 	def __init__(self, data_points):
 		self.data = data_points
-		self.membership_function = self.func_builder()
+		self.memb_func = self.func_builder()
 		self.range_map = self.range_dist()
 
 	def range_dist(self):
@@ -39,16 +39,20 @@ class Linear_Func():
 		if key == -1:
 			return None
 		else:
-			return self.membership_function[key](x)
+			return self.memb_func[key](x)
 
 	def eval_x(self, y):
 		X = []
 
-		for i, f in self.membership_function.items():
+		for i, f in self.memb_func.items():
 			root = (f - y).r
 			X.append(root[0])
-			
+
 		return X
+
+
+
+
 
 """
 if __name__ == '__main__':
