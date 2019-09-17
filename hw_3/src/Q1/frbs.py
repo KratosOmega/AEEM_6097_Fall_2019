@@ -2,41 +2,54 @@ import numpy as np
 import matplotlib.pyplot as plt
 import linear_func
 
+# QtFuzzyLite
+
 class FRBS():
-    def __init__(self, 
-        pts_output,
-        pts_input_I, 
-        pts_input_II = None, 
-        pts_input_III = None):
+    def __init__(self,
+        input_funcs_node_set,
+        output_funcs_node_set):
+        self.input_funcs_node_set = input_funcs_node_set
+        self.output_funcs_node_set = output_funcs_node_set
+        self.output_func_set = self.memb_func_builder(self.output_funcs_node_set)
+        self.input_func_set = self.memb_func_builder(self.input_funcs_node_set)
 
-        self.pts_output = pts_output
-        self.pts_input_I = pts_input_I
-        self.output_func = self.memb_func_builder(self.pts_output)
-        self.memb_func_I = self.memb_func_builder(self.pts_input_I)
-        # ------------------------------------------------
-        # add more membership functions as needed below
-        # ------------------------------------------------
-        self.pts_input_II = pts_input_II
-        self.pts_input_III = pts_input_III
-        self.memb_func_II = None if self.pts_input_II == None else self.memb_func_builder(self.pts_input_II)
-        self.memb_func_III = None if self.pts_input_III == None else self.memb_func_builder(self.pts_input_III)
+    def memb_func_builder(self, node_set):
+        """
+        node_set = {
+            "func_1" : {
+                "A" : [[,], [,], [,]],
+                "B" : [[,], [,], [,]],
+                "C" : [[,], [,]],
+            },
+            "func_1" : {
+                "D" : [[,], [,], [,]],
+                "E" : [[,], [,], [,]],
+                "F" : [[,], [,]],
+            },
+            ...
+        }
 
+        func_set = {
+            "func_1" : <numpy poly1d object>,
+            "func_2" : <numpy poly1d object>,
+            ...
+        }
+        """
+        func_set = {}
+        for cat, nodes in node_set.items():
+            memb_funcs = {}
+            for k, v in nodes.items():
+                lf = linear_func.Linear_Func(v)
+                memb_funcs[k] = lf
+            func_set[cat] = memb_funcs
+        return func_set
 
-    def memb_func_builder(self, pts):
-        memb_funcs = {}
-
-        for k, v in pts.items():
-            lf = linear_func.Linear_Func(v)
-            memb_funcs[k] = lf
-
-        return memb_funcs
-
-    def fuzzification(self, x, memb_func):
+    def fuzzification(self, x, func):
         #degrees = [0] * len(node_list)
         degrees = {}
 
-        for key, func in memb_func.items():
-            degrees[key] = func.eval_y(x)
+        for k, f in func.items():
+            degrees[k] = f.eval_y(x)
             
         degrees = self.cleaning(degrees)
 
