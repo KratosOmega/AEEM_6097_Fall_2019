@@ -52,7 +52,7 @@ class FRBS():
 
         for k, f in func.items():
             degrees[k] = f.eval_y(x)
-            
+
         degrees = self.cleaning(degrees)
 
         return degrees
@@ -65,14 +65,14 @@ class FRBS():
 
         return degrees
 
-    def defuzzification(self, fuzzified_input, rules):
+    def defuzzification(self, fuzzified_input, evaled_rules, output_cat):
         numerator = 0
         denominator = 0
 
-        for i, r in enumerate(rules):
+        for i, r in enumerate(evaled_rules):
             # 0.8
-            degree = fuzzified_input[r[0]]
-            output_func = self.output_func_set["output_1"][r[1]]
+            degree = r[1]
+            output_func = self.output_func_set[output_cat][r[0]]
 
             if degree != None:
                 w, cog = self.cog(output_func, self.precision, degree)
@@ -105,9 +105,39 @@ class FRBS():
         cog = numerator / denominator
         return weight, cog
 
+    def remove_none(self, dirty_input):
+        clean_input = {}
+
+        for k in dirty_input.keys():
+            if dirty_input[k]:
+                clean_input[k] = dirty_input[k]
+
+        return clean_input
+
+    def rules_eval(self, fuzzified_input, rules):
+        evaled_rules = []
+        clean_input = self.remove_none(fuzzified_input)
+        for r in rules:
+            degrees = []
+            params = r[0].split("+")
+
+            # AND operation
+            if len(params) > 0:
+                try:
+                    for p in params:
+                        degrees.append(clean_input[p])
+
+                    if len(degrees) > 0:
+                        evaled_degree = min(degrees)
+                        evaled_rules.append([r[1], evaled_degree])
+
+                except:
+                    print()
+
+        return evaled_rules
+
 """
 if __name__ == '__main__':
 """
-   
 
 
