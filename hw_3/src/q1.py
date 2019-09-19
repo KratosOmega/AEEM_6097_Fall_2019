@@ -257,8 +257,6 @@ if __name__ == '__main__':
     main(inp, out)
     #debug(inp, out)
     """
-    test = generate_membership_func()
-    for k, v in test.items():
-        print(k, v)
+    - the size of output function determine ...
     """
 

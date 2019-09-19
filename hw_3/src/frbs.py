@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import linear_func
+import operator
 
 # QtFuzzyLite
 
@@ -117,22 +118,54 @@ class FRBS():
     def rules_eval(self, fuzzified_input, rules):
         evaled_rules = []
         clean_input = self.remove_none(fuzzified_input)
+
         for r in rules:
-            degrees = []
-            params = r[0].split("+")
-
-            # AND operation
-            if len(params) > 0:
+            AND = r[0].split("+")
+            OR = r[0].split("-")
+            """
+            print("-----------")
+            print(r)
+            print(AND)
+            print(OR)
+            print("-----------")
+            """
+            # 1-to-1 operation
+            if len(AND) == 1 and len(OR) == 1:
                 try:
-                    for p in params:
-                        degrees.append(clean_input[p])
-
-                    if len(degrees) > 0:
-                        evaled_degree = min(degrees)
-                        evaled_rules.append([r[1], evaled_degree])
-
+                    evaled_rules.append([r[1], clean_input[r[0]]])
                 except:
-                    print()
+                    pass
+
+            if len(AND) > 1:
+                degrees = {}
+                try:
+                    for p in AND:
+                        degrees.append(clean_input[p])
+                    evaled_degree = min(degrees)
+                    evaled_rules.append([r[1], evaled_degree])
+                except:
+                    pass
+
+            if len(OR) > 1:
+                degrees = {}
+                try:
+                    """
+                    for p in OR:
+                        degrees.append(clean_input[p])
+                    evaled_degree = max(degrees)
+                    evaled_rules.append([r[1], evaled_degree])
+                    """
+                    for p in OR:
+                        if p in clean_input.keys():
+                            if clean_input[p] > self.precision:
+                                degrees[p] = clean_input[p]
+
+                    if len(degrees) != 0:
+                        op = max(degrees.values())
+                        key = list(degrees.keys())[list(degrees.values()).index(op)]
+                        evaled_rules.append([r[1], clean_input[key]])
+                except:
+                    pass
 
         return evaled_rules
 
