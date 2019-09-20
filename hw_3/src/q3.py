@@ -56,11 +56,11 @@ def get_data():
     }
 
     rules = [
-        ["x1", "y1"],
-        ["x2", "y2"],
-        ["x3", "y3"],
-        ["x4", "y4"],
-        ["x5", "y5"],
+        ["input_1=x1", "y1"],
+        ["input_1=x2", "y2"],
+        ["input_1=x3", "y3"],
+        ["input_1=x4", "y4"],
+        ["input_1=x5", "y5"],
     ]
 
     return input_funcs, output_funcs, rules
@@ -87,10 +87,13 @@ def main(inp, out):
     Y_origin = []
 
     for i in np.arange(lb, rb, step_size):
+        if i > rb:
+            break
         print("============ ", i)
-        fuzz = fuzzy.fuzzification(i, fuzzy.input_func_set[inp])
+        input_x = {"input_1" : i}
+        fuzz = fuzzy.fuzzification(input_x, fuzzy.input_func_set)
         evaled_rules = fuzzy.rules_eval(fuzz, rules)
-        crisp = fuzzy.defuzzification(fuzz, evaled_rules, out)
+        crisp = fuzzy.defuzzification(evaled_rules, "output_1")
         X.append(i)
         Y_fuzzy.append(crisp)
         Y_origin.append(target(i))
