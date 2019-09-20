@@ -45,16 +45,23 @@ class FRBS():
                 lf = linear_func.Linear_Func(v)
                 memb_funcs[k] = lf
             func_set[cat] = memb_funcs
+
         return func_set
+
+    def mu(self, inp_x):
+        winner = max(inp_x.values())
+        key = list(inp_x.keys())[list(inp_x.values()).index(winner)]
+        return key, inp_x[key]
 
     def fuzzification(self, x, func):
         #degrees = [0] * len(node_list)
         degrees = {}
 
-        for k, f in func.items():
-            degrees[k] = f.eval_y(x)
-
-        degrees = self.cleaning(degrees)
+        for k, v in x.items():
+            for i, x_f in func[k].items():
+                y = x_f.eval_y(v)
+                if y != None and y > self.precision:
+                    degrees[k + "=" + i] = y
 
         return degrees
 
@@ -66,19 +73,20 @@ class FRBS():
 
         return degrees
 
-    def defuzzification(self, fuzzified_input, evaled_rules, output_cat):
+    def defuzzification(self, evaled_rules, output_cat):
         numerator = 0
         denominator = 0
 
-        for i, r in enumerate(evaled_rules):
-            # 0.8
-            degree = r[1]
-            output_func = self.output_func_set[output_cat][r[0]]
+        print("------------------------- defuzz")
+        print(evaled_rules)
+        print("------------------------- defuzz")
 
-            if degree != None:
-                w, cog = self.cog(output_func, self.precision, degree)
-                numerator += (w * cog)
-                denominator += w
+
+        for y, degree in evaled_rules.items():
+            output_func = self.output_func_set[output_cat][y]
+            w, cog = self.cog(output_func, self.precision, degree)
+            numerator += (w * cog)
+            denominator += w
 
         cog_aggregated = numerator / denominator
 
@@ -115,37 +123,45 @@ class FRBS():
 
         return clean_input
 
+
+    def rule_op(self):
+        return False
+
+
     def rules_eval(self, fuzzified_input, rules):
-        evaled_rules = []
+        evaled_rules = {}
         clean_input = self.remove_none(fuzzified_input)
+
+        """
+        print("====================")
+        print(fuzzified_input)
+        print(rules)
+        print("====================")
+        """
 
         for r in rules:
             AND = r[0].split("+")
             OR = r[0].split("-")
-            """
-            print("-----------")
-            print(r)
-            print(AND)
-            print(OR)
-            print("-----------")
-            """
+
             # 1-to-1 operation
+            # TODO!
             if len(AND) == 1 and len(OR) == 1:
                 try:
-                    evaled_rules.append([r[1], clean_input[r[0]]])
+                    evaled_rules[r[1]] = fuzzified_input[r[0]]
                 except:
                     pass
 
             if len(AND) > 1:
-                degrees = {}
-                try:
-                    for p in AND:
-                        degrees.append(clean_input[p])
-                    evaled_degree = min(degrees)
-                    evaled_rules.append([r[1], evaled_degree])
-                except:
-                    pass
+                degrees = []
+                for p in AND:
+                    try:
+                        degrees.append(fuzzified_input[p])
+                    except:
+                        pass
+                evaled_degree = min(degrees)
+                evaled_rules[r[1]] = evaled_degree
 
+            # TODO!
             if len(OR) > 1:
                 degrees = {}
                 try:
@@ -167,6 +183,7 @@ class FRBS():
                 except:
                     pass
 
+        print(evaled_rules)
         return evaled_rules
 
 """

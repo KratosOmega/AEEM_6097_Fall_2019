@@ -37,51 +37,50 @@ def get_data():
 	# ----------------------------------------- preset dicts
     input_funcs = {
         "input_1" : {
-            "x1" : [[-11, 1], [-10, 1], [-5, 0]],
-            "x2" : [[-10, 0], [-5, 1], [0, 0]],
-            "x3" : [[-5, 0], [0, 1], [5, 0]],
-            "x4" : [[0, 0], [5, 1], [10, 0]],
-            "x5" : [[5, 0], [10, 1], [11, 1]],
+            "x1_1" : [[-4, 1], [-2, 0], [2, 0], [4, 1]],
+            "x1_2" : [[-4, 0], [-2, 1], [0, 0], [2, 1], [4, 0]],
+            "x1_3" : [[-2, 0], [0, 1], [2, 0]]
         },
     }
 
     output_funcs = {
         "output_1" : {
-            "y1": [[0, 1], [25, 0]],
-            "y2" : [[0, 0], [25, 1], [100, 0]],
-            "y3" : [[25, 0], [100, 1]],
+            "y1_1": [[0, 1], [4, 0]],
+            "y1_2" : [[0, 0], [4, 1], [8, 0]],
+            "y1_3" : [[4, 0], [8, 1]]            
         },
     }
 
     rules = [
-        ["x3", "y1"],
-        ["x2-x4", "y2"],
-        ["x1-x5", "y3"],
+        ["input_1=x1_3", "y1_1"],
+        ["input_1=x1_1", "y1_3"],
+        ["input_1=x1_2", "y1_2"],
     ]
 
     return input_funcs, output_funcs, rules
 
-def main(inp, out):
+def main():
     # -----------------------------------------
     input_funcs, output_funcs, rules = get_data()
 
     fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.001)
-    lb = -10.0
-    rb = 10.0
+    lb = -4.0
+    rb = 4.0
     step_size = 0.1
 
     X = []
     Y_fuzzy = []
     Y_origin = []
 
-    for i in np.arange(lb, rb+1, step_size):
+    for i in np.arange(lb, rb, step_size):
         print("============ ", i)
-        fuzz = fuzzy.fuzzification(i, fuzzy.input_func_set[inp])
+        input_x = {"input_1" : i}
+        fuzz = fuzzy.fuzzification(input_x, fuzzy.input_func_set)
         evaled_rules = fuzzy.rules_eval(fuzz, rules)
-        crisp = fuzzy.defuzzification(fuzz, evaled_rules, out)
+        crisp = fuzzy.defuzzification(evaled_rules, "output_1")
         X.append(i)
         Y_fuzzy.append(crisp)
-        Y_origin.append(math.pow(i, 2))
+        Y_origin.append(math.pow(i, 2)/2)
 
     plt.plot(X, Y_fuzzy, X, Y_origin)
     plt.show()
@@ -109,9 +108,7 @@ def debug(inp, out):
 
 
 if __name__ == '__main__':
-    inp = "input_1"
-    out = "output_1"
-    main(inp, out)
+    main()
     #debug(inp, out)
     """
     - the size of output function determine ...

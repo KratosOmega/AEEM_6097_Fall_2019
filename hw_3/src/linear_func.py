@@ -54,6 +54,15 @@ class Linear_Func():
 
 
 
+
+
+
+
+
+
+
+
+
 """
 if __name__ == '__main__':
 	data_points = [[0, 3], [2, 3], [4, 0]]
