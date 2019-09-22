@@ -12,7 +12,7 @@ def performance(X, Yh, Yt):
     return sum(deviations) / len(X)
 
 def get_data():
-	# ----------------------------------------- preset dicts
+    # ----------------------------------------- preset dicts
     input_funcs = {
         "input_1" : {
             "x1" : [[0, 1], [0.01, 0]],
@@ -55,8 +55,41 @@ def get_data():
 
     return input_funcs, output_funcs, rules
 
+def get_hint_data():
+    # ----------------------------------------- preset dicts
+    input_funcs = {
+        "input_1" : {
+            "x1" : [[0, 0], [0.25, 1], [0.5, 1]],
+            "x2" : [[0.25, 0], [0.5, 1], [0.75, 0]],
+            "x3" : [[0.5, 0], [1, 1], [1, 0]],
+        },
+    }
+
+    output_funcs = {
+        "output_1" : {
+            "y1" : [[0, 0], [0.25, 1], [0.5, 0]],
+            "y2" : [[0.25, 0], [1, 1], [1, 0]],
+        },
+    }
+
+    rules = [
+        ["input_1=x1", "y1"],
+        ["input_1=x2", "y2"],
+        ["input_1=x3", "y2"],
+    ]
+
+    return input_funcs, output_funcs, rules    
+
 def main():
     # -----------------------------------------
+    """
+    get_hint_data() using hw given MF and rules
+    get_data() using updated MF and rules
+    """
+    input_funcs, output_funcs, rules = get_data()
+    #input_funcs, output_funcs, rules = get_hint_data()
+    # -----------------------------------------
+
     lb = 0.0
     rb = 1.0
     step_size = 0.1
@@ -65,11 +98,10 @@ def main():
     Y_fuzzy = []
     Y_origin = []
 
-    input_funcs, output_funcs, rules = get_data()
 
     fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.001)
 
-    for i in np.arange(lb, rb+1, step_size):
+    for i in np.arange(lb, rb+0.2, step_size):
         if i > rb:
             break
         print("-------------------- ", i)

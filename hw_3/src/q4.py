@@ -77,7 +77,7 @@ def debug():
 
     fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.001)
     input_x = {
-        "input_1": 7,
+        "input_1": 6,
         "input_2": 10,
     }
 
@@ -86,13 +86,13 @@ def debug():
 
     yH = fuzzy.defuzzification(evaled_rules, "output_1")
 
-    print(yH)
-    print("------------")
+    print("input_1 = ", input_x["input_1"], ", input_2 = ", input_x["input_2"])
+    print("output = ", yH)
 
 
 if __name__ == '__main__':
-    main()
-    #debug()
+    #main()
+    debug()
     """
     - the size of output function determine ...
     """

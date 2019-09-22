@@ -15,8 +15,8 @@ def performance(X, Yh, Yt):
     avg =  sum(diffs) / len(diffs)
     return avg
 
-def get_data():
-	# ----------------------------------------- preset dicts
+def get_hint_data():
+    # ----------------------------------------- preset dicts
     input_funcs = {
         "input_1" : {
             "x1" : [[-11, 1], [-10, 1], [-5, 0], [5, 0], [10, 1], [11, 1]],
@@ -43,7 +43,13 @@ def get_data():
 
 def main():
     # -----------------------------------------
-    input_funcs, output_funcs, rules = get_data()
+    """
+    get_hint_data() using hw given MF and rules
+    get_data() using updated MF and rules
+    """
+    #input_funcs, output_funcs, rules = get_data()
+    input_funcs, output_funcs, rules = get_hint_data()
+    # -----------------------------------------
 
     fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.001)
     lb = -10.0

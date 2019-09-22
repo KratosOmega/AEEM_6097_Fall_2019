@@ -1,0 +1,32 @@
+[System]
+Name='hw_3_q1'
+Type='mamdani'
+Version=2.0
+NumInputs=1
+NumOutputs=1
+NumRules=3
+AndMethod='min'
+OrMethod='max'
+ImpMethod='min'
+AggMethod='max'
+DefuzzMethod='centroid'
+
+[Input1]
+Name='input_1'
+Range=[0 1]
+NumMFs=3
+MF1='x1_3':'trimf',[0.5 1 1]
+MF2='x1_2':'trimf',[0.25 0.5 0.75]
+MF3='x1_1':'trimf',[0 0.25 0.5]
+
+[Output1]
+Name='output'
+Range=[0 1]
+NumMFs=2
+MF1='y1_1':'trimf',[0 0.25 0.5]
+MF2='y1_2':'trimf',[0.25 1 1]
+
+[Rules]
+3, 1 (1) : 1
+2, 2 (1) : 1
+1, 2 (1) : 1

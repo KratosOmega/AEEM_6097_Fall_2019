@@ -3,24 +3,6 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 
-def generate_membership_func():
-    num_of_cat = 9
-    funcs = {
-        "x1" : [[0, 1], [0.01, 0]],
-        "x2" : [[0.99, 0], [1, 1]],
-    }
-    step = 0.005
-    init = 0.005
-
-    for i in range(3, num_of_cat+1):
-        print(i)
-        key = "x" + str(i)
-        funcs[key] = [[init - step, 0], [init, 1], [init + step, 0]]
-        step = step * 2
-        init += step
-
-    return funcs
-
 def performance(X, Yh, Yt):
     deviations = []
     diffs = []
@@ -32,6 +14,32 @@ def performance(X, Yh, Yt):
 
     avg =  sum(diffs) / len(diffs)
     return avg
+
+def get_hint_data():
+    # ----------------------------------------- preset dicts
+    input_funcs = {
+        "input_1" : {
+            "x1_1" : [[-4, 1], [-2, 0], [2, 0], [4, 1]],
+            "x1_2" : [[-4, 0], [-2, 1], [0, 0], [2, 1], [4, 0]],
+            "x1_3" : [[-2, 0], [0, 1], [2, 0]]
+        },
+    }
+
+    output_funcs = {
+        "output_1" : {
+            "y1_1" : [[4, 0], [8, 1]],        
+            "y1_2" : [[0, 0], [4, 1], [8, 0]],
+            "y1_3": [[0, 1], [4, 0]],
+        },
+    }
+
+    rules = [
+        ["input_1=x1_1", "y1_1"],
+        ["input_1=x1_2", "y1_2"],
+        ["input_1=x1_3", "y1_3"],
+    ]
+
+    return input_funcs, output_funcs, rules
 
 def get_data():
 	# ----------------------------------------- preset dicts
@@ -61,12 +69,18 @@ def get_data():
 
 def main():
     # -----------------------------------------
-    input_funcs, output_funcs, rules = get_data()
+    """
+    get_hint_data() using hw given MF and rules
+    get_data() using updated MF and rules
+    """
+    #input_funcs, output_funcs, rules = get_data()
+    input_funcs, output_funcs, rules = get_hint_data()
+    # -----------------------------------------
 
     fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.001)
     lb = -4.0
     rb = 4.0
-    step_size = 0.1
+    step_size = 0.01
 
     X = []
     Y_fuzzy = []

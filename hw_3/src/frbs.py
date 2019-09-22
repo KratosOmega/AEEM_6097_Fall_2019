@@ -74,18 +74,21 @@ class FRBS():
         return degrees
 
     def defuzzification(self, evaled_rules, output_cat):
-        numerator = 0
-        denominator = 0
+        try: 
+            numerator = 0
+            denominator = 0
 
-        for y, degree in evaled_rules.items():
-            output_func = self.output_func_set[output_cat][y]
-            w, cog = self.cog(output_func, self.precision, degree)
-            numerator += (w * cog)
-            denominator += w
+            for y, degree in evaled_rules.items():
+                output_func = self.output_func_set[output_cat][y]
+                w, cog = self.cog(output_func, self.precision, degree)
+                numerator += (w * cog)
+                denominator += w
 
-        cog_aggregated = numerator / denominator
+            cog_aggregated = numerator / denominator
 
-        return cog_aggregated
+            return cog_aggregated
+        except:
+            return 0
 
     def cog(self, func, precision, degree):
         """
