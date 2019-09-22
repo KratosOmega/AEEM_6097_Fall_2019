@@ -7,13 +7,9 @@ def performance(X, Yh, Yt):
     deviations = []
     diffs = []
     for i in range(len(X)):
-        deviations.append(Yh[i] - Yt[i])
-        diffs.append(abs(Yh[i] - Yt[i]))
+        deviations.append(1 - (abs(Yh[i] + 0.01))/(abs(Yt[i]) + 0.01))
 
-    plt.plot(X, deviations)
-
-    avg =  sum(diffs) / len(diffs)
-    return avg
+    return sum(deviations) / len(X)
 
 def get_data():
 	# ----------------------------------------- preset dicts

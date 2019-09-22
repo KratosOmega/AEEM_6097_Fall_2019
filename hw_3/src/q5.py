@@ -38,23 +38,23 @@ def get_data():
     input_funcs = {
         "input_1" : {
             "x1_1" : [[-4, 1], [-2, 0], [2, 0], [4, 1]],
-            "x1_2" : [[-4, 0], [-2, 1], [0, 0], [2, 1], [4, 0]],
-            "x1_3" : [[-2, 0], [0, 1], [2, 0]]
+            "x1_2" : [[-4, 0], [-1, 1], [0, 0], [1, 1], [4, 0]],
+            "x1_3" : [[-4, 0], [0, 1], [4, 0]]
         },
     }
 
     output_funcs = {
         "output_1" : {
-            "y1_1": [[0, 1], [4, 0]],
-            "y1_2" : [[0, 0], [4, 1], [8, 0]],
-            "y1_3" : [[4, 0], [8, 1]]            
+            "y1_1" : [[7, 0], [8, 1]],        
+            "y1_2" : [[3.9, 0], [4, 1], [4.1, 0]],
+            "y1_3": [[0, 1], [1, 0]],
         },
     }
 
     rules = [
-        ["input_1=x1_3", "y1_1"],
-        ["input_1=x1_1", "y1_3"],
+        ["input_1=x1_1", "y1_1"],
         ["input_1=x1_2", "y1_2"],
+        ["input_1=x1_3", "y1_3"],
     ]
 
     return input_funcs, output_funcs, rules
@@ -72,7 +72,9 @@ def main():
     Y_fuzzy = []
     Y_origin = []
 
-    for i in np.arange(lb, rb, step_size):
+    for i in np.arange(lb, rb+1, step_size):
+        if i > rb:
+            break
         print("============ ", i)
         input_x = {"input_1" : i}
         fuzz = fuzzy.fuzzification(input_x, fuzzy.input_func_set)

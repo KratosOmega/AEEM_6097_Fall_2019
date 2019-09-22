@@ -77,11 +77,6 @@ class FRBS():
         numerator = 0
         denominator = 0
 
-        print("------------------------- defuzz")
-        print(evaled_rules)
-        print("------------------------- defuzz")
-
-
         for y, degree in evaled_rules.items():
             output_func = self.output_func_set[output_cat][y]
             w, cog = self.cog(output_func, self.precision, degree)
@@ -128,7 +123,7 @@ class FRBS():
         return False
 
 
-    def rules_eval(self, fuzzified_input, rules):
+    def rules_eval(self, fuzzified_input, rules, special_op = ""):
         evaled_rules = {}
         clean_input = self.remove_none(fuzzified_input)
 
@@ -152,14 +147,23 @@ class FRBS():
                     pass
 
             if len(AND) > 1:
+                not_fire = False
                 degrees = []
                 for p in AND:
                     try:
                         degrees.append(fuzzified_input[p])
                     except:
+                        not_fire = True
                         pass
-                evaled_degree = min(degrees)
-                evaled_rules[r[1]] = evaled_degree
+
+                if not not_fire:
+                    evaled_degree = min(degrees)
+
+                    # Q4 operation
+                    if special_op == "max_prod_comp":
+                        evaled_degree = np.prod(degrees)
+
+                    evaled_rules[r[1]] = evaled_degree
 
             # TODO!
             if len(OR) > 1:
@@ -183,7 +187,6 @@ class FRBS():
                 except:
                     pass
 
-        print(evaled_rules)
         return evaled_rules
 
 """
