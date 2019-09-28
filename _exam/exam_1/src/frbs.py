@@ -158,12 +158,6 @@ class FRBS():
             if len(OR) > 1:
                 degrees = {}
                 try:
-                    """
-                    for p in OR:
-                        degrees.append(clean_input[p])
-                    evaled_degree = max(degrees)
-                    evaled_rules.append([r[1], evaled_degree])
-                    """
                     for p in OR:
                         if p in clean_input.keys():
                             if clean_input[p] > self.precision:

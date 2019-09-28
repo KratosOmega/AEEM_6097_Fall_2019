@@ -13,7 +13,6 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from utils import updateReport
 from mpl_toolkits.mplot3d import Axes3D
 
-
 def plot_3d(X, Y, Z, x_size, y_size):
     x = np.reshape(X, (x_size, y_size))
     y = np.reshape(Y, (x_size, y_size))
@@ -146,6 +145,9 @@ def main():
     #input_1, input_2 = get_input_data(num_pts_1, num_pts_2)
     input_funcs, output_funcs, rules = get_mf_rule()
 
+    # !!!: precision in FRBS() need to be adjusted base on input scale
+    # ex: for scale of 100+, precision = 0.1 is good
+    # ex: for scale of 0 ~ 1, precision = 0.001 is good
     fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.1)
 
     water_fr = []
@@ -172,25 +174,6 @@ def main():
             counter += 1
 
     plot_3d(water_fr, water_lvl, power, len(input_1), len(input_2))
-
-    #plt.plot(X, Y_fuzzy)
-    #plt.show()
-
-    """
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-
-    # prepare data.
-    water_lvl = np.asarray(water_lvl)
-    water_fr = np.asarray(water_fr)
-    power = np.asarray(power)
-    water_lvl, water_fr = np.meshgrid(water_lvl, water_fr)
-
-    # Plot the surface.
-    surf = ax.plot_surface(water_lvl, water_fr, power, cmap=cm.coolwarm,
-                           linewidth=0, antialiased=False)
-    plt.show()
-    """
 
 def debug():
     # -----------------------------------------
