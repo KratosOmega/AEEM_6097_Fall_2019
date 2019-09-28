@@ -24,21 +24,21 @@ def plot_3d(X, Y, Z, x_size, y_size):
 
     ax.plot_surface(x, y, z)
 
-    ax.set_xlabel('water_lvl')
-    ax.set_ylabel('water_fr')
+    ax.set_xlabel('water_fr')
+    ax.set_ylabel('water_lvl')
     ax.set_zlabel('power')
 
     plt.show()
 
-def get_input_data(input_1_size, input_2_size):
+def get_input_data(num_pts_1, num_pts_2):
     input_1 = []
     input_2 = []
 
-    for i in range(input_1_size):
-        input_1.append(random.uniform(0, 170)) # Dam Water Level
+    for i in range(num_pts_1):
+        input_1.append(random.uniform(0, 4000)) # Dam Water Level
         
-    for i in range(input_2_size):
-        input_2.append(random.uniform(0, 4000)) # Upstream Water Flow Rate
+    for i in range(num_pts_2):
+        input_2.append(random.uniform(0, 170)) # Upstream Water Flow Rate
 
     #plt.plot(input_1, input_2)
     #plt.show()
@@ -46,26 +46,26 @@ def get_input_data(input_1_size, input_2_size):
     return input_1, input_2
 
 
-def get_input_data_segmented(input_1_size, input_2_size, segment_num_1, segment_num_2):
+def get_input_data_segmented(num_pts_1, num_pts_2, segment_num_1, segment_num_2):
     input_1 = []
     input_2 = []
 
     l = 0
     r = 0
     for m in range(segment_num_1):
-        interval = (170 - 0) / segment_num_1
+        interval = (4000 - 0) / segment_num_1
         l = r
         r = l + interval
-        for n in range(input_1_size):
+        for n in range(num_pts_1):
             input_1.append(random.uniform(l, r)) # Dam Water Level
         
     l = 0
     r = 0
-    for m in range(input_2_size):
-        interval = (4000 - 0) / segment_num_1
+    for m in range(segment_num_2):
+        interval = (170 - 0) / segment_num_2
         l = r
         r = l + interval
-        for n in range(input_1_size):
+        for n in range(num_pts_2):
             input_2.append(random.uniform(l, r)) # Upstream Water Flow Rate
 
     #plt.plot(input_1, input_2)
@@ -76,6 +76,13 @@ def get_input_data_segmented(input_1_size, input_2_size, segment_num_1, segment_
 def get_mf_rule():
 	# ----------------------------------------- preset dicts
     input_funcs = {
+        "water_fr" : {
+            "x2_1" : [[-1000,0], [0, 1], [1000, 0]],
+            "x2_2" : [[0,0], [1000, 1], [2000, 0]],
+            "x2_3" : [[1000,0], [2000, 1], [3000, 0]],
+            "x2_4" : [[2000,0], [3000, 1], [4000, 0]],
+            "x2_5" : [[3000,0], [4000, 1], [5000, 0]],
+        },
         "water_lvl" : {
             "x1_1" : [[-42.5, 0], [0, 1], [42.5, 0]],
             "x1_2" : [[0, 0], [42.5, 1], [85, 0]],
@@ -83,13 +90,6 @@ def get_mf_rule():
             "x1_4" : [[85, 0], [127.5, 1], [170, 0]],
             "x1_5" : [[127.5, 0], [170, 1], [212.5, 0]],
         },
-        "water_fr" : {
-            "x2_1" : [[-1000,0], [0, 1], [1000, 0]],
-            "x2_2" : [[0,0], [1000, 1], [2000, 0]],
-            "x2_3" : [[1000,0], [2000, 1], [3000, 0]],
-            "x2_4" : [[2000,0], [3000, 1], [4000, 0]],
-            "x2_5" : [[3000,0], [4000, 1], [5000, 0]],
-        }
     }
 
     output_funcs = {
@@ -135,38 +135,43 @@ def get_mf_rule():
 
 def main():
     # -----------------------------------------
-    input_1_size, input_2_size = 10, 10
+    num_pts_1, num_pts_2 = 2, 2
     segment_num_1, segment_num_2 = 10, 10
+    counter = 1
+    total = num_pts_1 * num_pts_2 * segment_num_1 * segment_num_2
+    
     # this is an alternative to segment the domain in order to get data from all coners evenly
-    input_1, input_2 = get_input_data_segmented(input_1_size, input_2_size, segment_num_1, segment_num_2)
+    input_1, input_2 = get_input_data_segmented(num_pts_1, num_pts_2, segment_num_1, segment_num_2)
     # this is suit for supercomputer to getnerate huge data to cover all coners
-    #input_1, input_2 = get_input_data(input_1_size, input_2_size)
+    #input_1, input_2 = get_input_data(num_pts_1, num_pts_2)
     input_funcs, output_funcs, rules = get_mf_rule()
 
-    fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.001)
+    fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.1)
 
-    water_lvl = []
     water_fr = []
+    water_lvl = []
     power = []
 
     for m in input_1:
         for n in input_2:
             x = {
-                "water_lvl": m,
-                "water_fr": n,
+                "water_fr": m,
+                "water_lvl": n,
             }
             fuzz = fuzzy.fuzzification(x, fuzzy.input_func_set)
             evaled_rules = fuzzy.rules_eval(fuzz, rules)
             crisp = fuzzy.defuzzification(evaled_rules, "power")
 
-            water_lvl.append(m)
-            water_fr.append(n)
+            water_fr.append(m)
+            water_lvl.append(n)
             power.append(crisp)
 
-            print("water_lvl = ", m, " water_fr = ", n, " power = ", crisp)
+            print("Total run: ", total, " -----------> ", counter)
+            #print("water_lvl = ", m, " water_fr = ", n, " power = ", crisp)
             updateReport("/report.csv", [str(m), str(n), str(crisp)])
+            counter += 1
 
-    plot_3d(water_lvl, water_fr, power, input_1_size, input_2_size)
+    plot_3d(water_fr, water_lvl, power, len(input_1), len(input_2))
 
     #plt.plot(X, Y_fuzzy)
     #plt.show()
@@ -189,7 +194,10 @@ def main():
 
 def debug():
     # -----------------------------------------
-    input_1, input_2 = get_input_data(10)
+    # this is an alternative to segment the domain in order to get data from all coners evenly
+    #input_1, input_2 = get_input_data_segmented(input_1_size, input_2_size, segment_num_1, segment_num_2)
+    # this is suit for supercomputer to getnerate huge data to cover all coners
+    #input_1, input_2 = get_input_data(input_1_size, input_2_size)
     input_funcs, output_funcs, rules = get_mf_rule()
 
     fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.001)
@@ -203,14 +211,18 @@ def debug():
         "water_fr": water_fr,
     }
 
+    print("--------------- hit")
+    print(fuzzy.input_func_set["water_lvl"]["x1_1"].range_map)
+    print(fuzzy.input_func_set["water_lvl"]["x1_1"].mf)
+    print(fuzzy.input_func_set["water_lvl"]["x1_1"].integral)
+    print("--------------- end")
     fuzz = fuzzy.fuzzification(x, fuzzy.input_func_set)
     evaled_rules = fuzzy.rules_eval(fuzz, rules)
 
     print(evaled_rules)
     crisp = fuzzy.defuzzification(evaled_rules, "power")
 
-    print(water_lvl)
-    print(water_fr)
+    print(x)
     print(crisp)
 
 if __name__ == '__main__':

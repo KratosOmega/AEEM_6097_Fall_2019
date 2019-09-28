@@ -9,6 +9,17 @@ class Linear_Func():
 		self.data = data_points
 		self.mf = self.func_builder()
 		self.range_map = self.range_dist()
+		self.integral = self.cal_integral()
+
+	def cal_integral(self):
+		integral = 0
+
+		for k in self.mf.keys():
+			integral_left = self.mf[k].integ()(self.range_map[k][0])
+			integral_right = self.mf[k].integ()(self.range_map[k][1])
+			integral += integral_right - integral_left
+
+		return integral
 
 	def range_dist(self):
 		range_map = {}

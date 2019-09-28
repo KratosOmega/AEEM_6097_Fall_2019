@@ -60,6 +60,7 @@ class FRBS():
             for y, degree in evaled_rules.items():
                 output_func = self.output_func_set[output_cat][y]
                 w, cog = self.cog(output_func, self.precision, degree)
+                #w, cog = self.cog_2(output_func, self.precision, degree)
                 numerator += (w * cog)
                 denominator += w
 
@@ -89,6 +90,21 @@ class FRBS():
                 numerator += (a + b) * pointer / 2
                 denominator += ((a + b) / 2)
         cog = numerator / denominator
+        return weight, cog
+
+    def cog_2(self, func, precision, mu):
+        weight = 0
+        cog = 0
+
+        print("---------- cog _ 2")
+        intersects = func.eval_x(mu)
+        inner_base = abs(intersects[1] - intersects[0])
+        outer_base = abs(func.range_map[1][1] - func.range_map[0][0])
+        base_ratio = inner_base / outer_base
+        integral_ratio = np.pow(base_ratio, 2)
+
+        # TODO: finish the integral method for finding COG
+
         return weight, cog
 
     def remove_none(self, dirty_input):
