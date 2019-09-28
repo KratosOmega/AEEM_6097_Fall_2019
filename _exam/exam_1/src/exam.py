@@ -37,7 +37,7 @@ def get_input_data(num_pts_1, num_pts_2):
         input_1.append(random.uniform(0, 4000)) # Dam Water Level
         
     for i in range(num_pts_2):
-        input_2.append(random.uniform(0, 170)) # Upstream Water Flow Rate
+        input_2.append(random.uniform(0, 160)) # Upstream Water Flow Rate
 
     #plt.plot(input_1, input_2)
     #plt.show()
@@ -61,7 +61,7 @@ def get_input_data_segmented(num_pts_1, num_pts_2, segment_num_1, segment_num_2)
     l = 0
     r = 0
     for m in range(segment_num_2):
-        interval = (170 - 0) / segment_num_2
+        interval = (160 - 0) / segment_num_2
         l = r
         r = l + interval
         for n in range(num_pts_2):
@@ -76,66 +76,67 @@ def get_mf_rule():
 	# ----------------------------------------- preset dicts
     input_funcs = {
         "water_fr" : {
-            "x2_1" : [[-1000,0], [0, 1], [1000, 0]],
-            "x2_2" : [[0,0], [1000, 1], [2000, 0]],
-            "x2_3" : [[1000,0], [2000, 1], [3000, 0]],
-            "x2_4" : [[2000,0], [3000, 1], [4000, 0]],
-            "x2_5" : [[3000,0], [4000, 1], [5000, 0]],
+            "x1_1" : [[0,0], [0.1, 1], [1000, 0]],
+            "x1_2" : [[900,0], [1400, 1], [2000, 0]],
+            "x1_3" : [[1000,0], [2000, 1], [3000, 0]],
+            "x1_4" : [[2000,0], [3000, 1], [4000, 0]],
+            "x1_5" : [[3000,0], [4000, 1], [4000.1, 0]],
         },
         "water_lvl" : {
-            "x1_1" : [[-42.5, 0], [0, 1], [42.5, 0]],
-            "x1_2" : [[0, 0], [42.5, 1], [85, 0]],
-            "x1_3" : [[42.5, 0], [85, 1], [127.5, 0]],
-            "x1_4" : [[85, 0], [127.5, 1], [170, 0]],
-            "x1_5" : [[127.5, 0], [170, 1], [212.5, 0]],
+            "x2_1" : [[0, 0], [0.1, 1], [42.5, 0]],
+            "x2_2" : [[0, 0], [42.5, 1], [85, 0]],
+            "x2_3" : [[80, 0], [100, 1], [130, 0]],
+            "x2_4" : [[110, 0], [130, 1], [160, 0]],
+            "x2_5" : [[140, 0], [170, 1], [170.1, 0]],
         },
     }
 
     output_funcs = {
         "power" : {
-            "y1_1": [[0, 0], [0.1, 1], [60, 0]],
-            "y1_2" : [[0, 0], [60, 1], [120, 0]],
-            "y1_3" : [[60, 0], [120, 1], [120.1, 0]],
+            "y1_1": [[-30, 0], [0, 1], [30, 0]],
+            "y1_2" : [[0, 0], [45, 1], [90, 0]],
+            "y1_3" : [[30, 0], [115, 1], [160, 0]],
         },
     }
 
     rules = [
-        ["water_lvl=x1_1+water_fr=x2_1", "y1_1"],
-        ["water_lvl=x1_1+water_fr=x2_2", "y1_1"],
-        ["water_lvl=x1_1+water_fr=x2_3", "y1_1"],
-        ["water_lvl=x1_2+water_fr=x2_1", "y1_1"],
-        ["water_lvl=x1_2+water_fr=x2_2", "y1_1"],
-        ["water_lvl=x1_2+water_fr=x2_3", "y1_1"],
-        ["water_lvl=x1_3+water_fr=x2_1", "y1_1"],
-        ["water_lvl=x1_3+water_fr=x2_2", "y1_1"],
-        ["water_lvl=x1_3+water_fr=x2_3", "y1_1"],
+        ["water_fr=x1_1+water_lvl=x2_1", "y1_1"],
+        ["water_fr=x1_1+water_lvl=x2_2", "y1_1"],
+        ["water_fr=x1_1+water_lvl=x2_3", "y1_1"],
+        ["water_fr=x1_2+water_lvl=x2_1", "y1_1"],
+        ["water_fr=x1_2+water_lvl=x2_2", "y1_1"],
+        ["water_fr=x1_2+water_lvl=x2_3", "y1_1"],
+        ["water_fr=x1_3+water_lvl=x2_1", "y1_1"],
+        ["water_fr=x1_3+water_lvl=x2_2", "y1_1"],
+        ["water_fr=x1_3+water_lvl=x2_3", "y1_1"],
 
-        ["water_lvl=x1_1+water_fr=x2_4", "y1_2"],
-        ["water_lvl=x1_1+water_fr=x2_5", "y1_2"],
-        ["water_lvl=x1_2+water_fr=x2_4", "y1_2"],
-        ["water_lvl=x1_2+water_fr=x2_5", "y1_2"],
-        ["water_lvl=x1_3+water_fr=x2_4", "y1_2"],
-        ["water_lvl=x1_3+water_fr=x2_5", "y1_2"],
+        ["water_fr=x1_1+water_lvl=x2_4", "y1_1"],
+        ["water_fr=x1_1+water_lvl=x2_5", "y1_2"],
+        ["water_fr=x1_2+water_lvl=x2_4", "y1_1"],
+        ["water_fr=x1_2+water_lvl=x2_5", "y1_2"],
+        ["water_fr=x1_3+water_lvl=x2_4", "y1_2"],
+        ["water_fr=x1_3+water_lvl=x2_5", "y1_3"],
 
-        ["water_lvl=x1_4+water_fr=x2_1", "y1_2"],
-        ["water_lvl=x1_4+water_fr=x2_2", "y1_2"],
-        ["water_lvl=x1_4+water_fr=x2_3", "y1_2"],
-        ["water_lvl=x1_5+water_fr=x2_1", "y1_2"],
-        ["water_lvl=x1_5+water_fr=x2_2", "y1_2"],
-        ["water_lvl=x1_5+water_fr=x2_3", "y1_2"],
+        ["water_fr=x1_4+water_lvl=x2_1", "y1_2"],
+        ["water_fr=x1_4+water_lvl=x2_2", "y1_2"],
+        ["water_fr=x1_4+water_lvl=x2_3", "y1_2"],
+        
+        ["water_fr=x1_5+water_lvl=x2_1", "y1_2"],
+        ["water_fr=x1_5+water_lvl=x2_2", "y1_2"],
+        ["water_fr=x1_5+water_lvl=x2_3", "y1_2"],
 
-        ["water_lvl=x1_4+water_fr=x2_4", "y1_3"],
-        ["water_lvl=x1_4+water_fr=x2_5", "y1_3"],
-        ["water_lvl=x1_5+water_fr=x2_4", "y1_3"],
-        ["water_lvl=x1_5+water_fr=x2_5", "y1_3"],
+        ["water_fr=x1_4+water_lvl=x2_4", "y1_3"],
+        ["water_fr=x1_4+water_lvl=x2_5", "y1_3"],
+        ["water_fr=x1_5+water_lvl=x2_4", "y1_3"],
+        ["water_fr=x1_5+water_lvl=x2_5", "y1_3"],
     ]
 
     return input_funcs, output_funcs, rules
 
 def main():
     # -----------------------------------------
-    num_pts_1, num_pts_2 = 2, 2
-    segment_num_1, segment_num_2 = 10, 10
+    num_pts_1, num_pts_2 = 1, 1
+    segment_num_1, segment_num_2 = 30, 20
     counter = 1
     total = num_pts_1 * num_pts_2 * segment_num_1 * segment_num_2
     
@@ -183,22 +184,17 @@ def debug():
     #input_1, input_2 = get_input_data(input_1_size, input_2_size)
     input_funcs, output_funcs, rules = get_mf_rule()
 
-    fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.001)
+    fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.1)
 
-    water_lvl = 40
-    water_fr = 3500
+    water_fr = 2100
+    water_lvl = 25
     power = []
 
     x = {
-        "water_lvl": water_lvl,
         "water_fr": water_fr,
+        "water_lvl": water_lvl,
     }
 
-    print("--------------- hit")
-    print(fuzzy.input_func_set["water_lvl"]["x1_1"].range_map)
-    print(fuzzy.input_func_set["water_lvl"]["x1_1"].mf)
-    print(fuzzy.input_func_set["water_lvl"]["x1_1"].integral)
-    print("--------------- end")
     fuzz = fuzzy.fuzzification(x, fuzzy.input_func_set)
     evaled_rules = fuzzy.rules_eval(fuzz, rules)
 
