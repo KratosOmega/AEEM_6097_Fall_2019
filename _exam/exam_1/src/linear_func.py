@@ -7,7 +7,7 @@ import numpy as np
 class Linear_Func():
 	def __init__(self, data_points):
 		self.data = data_points
-		self.memb_func = self.func_builder()
+		self.mf = self.func_builder()
 		self.range_map = self.range_dist()
 
 	def range_dist(self):
@@ -43,12 +43,12 @@ class Linear_Func():
 		if key == -1:
 			return None
 		else:
-			return self.memb_func[key](x)
+			return self.mf[key](x)
 
 	def eval_x(self, y):
 		X = []
 
-		for i, f in self.memb_func.items():
+		for i, f in self.mf.items():
 			root = (f - y).r
 			X.append(root[0])
 

@@ -12,18 +12,18 @@ class FRBS():
         precision):
         self.input_funcs_node_set = input_funcs_node_set
         self.output_funcs_node_set = output_funcs_node_set
-        self.output_func_set = self.memb_func_builder(self.output_funcs_node_set)
-        self.input_func_set = self.memb_func_builder(self.input_funcs_node_set)
+        self.output_func_set = self.mf_builder(self.output_funcs_node_set)
+        self.input_func_set = self.mf_builder(self.input_funcs_node_set)
         self.precision = precision
 
-    def memb_func_builder(self, node_set):
+    def mf_builder(self, node_set):
         func_set = {}
         for cat, nodes in node_set.items():
-            memb_funcs = {}
+            mfs = {}
             for k, v in nodes.items():
                 lf = linear_func.Linear_Func(v)
-                memb_funcs[k] = lf
-            func_set[cat] = memb_funcs
+                mfs[k] = lf
+            func_set[cat] = mfs
 
         return func_set
 
@@ -53,7 +53,7 @@ class FRBS():
         return degrees
 
     def defuzzification(self, evaled_rules, output_cat):
-        try: 
+        try:
             numerator = 0
             denominator = 0
 
@@ -82,8 +82,8 @@ class FRBS():
             pointer = interval[0]
             destination = interval[1]
             while pointer < destination:
-                a = min(degree, func.memb_func[idx](pointer))
-                b = min(degree, func.memb_func[idx](pointer + precision))
+                a = min(degree, func.mf[idx](pointer))
+                b = min(degree, func.mf[idx](pointer + precision))
                 pointer += precision
                 weight += (a + b) * precision / 2
                 numerator += (a + b) * pointer / 2
@@ -100,10 +100,8 @@ class FRBS():
 
         return clean_input
 
-
     def rule_op(self):
         return False
-
 
     def rules_eval(self, fuzzified_input, rules, special_op = ""):
         evaled_rules = {}

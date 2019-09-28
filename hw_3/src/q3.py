@@ -1,3 +1,7 @@
+"""
+Author: XIN LI
+"""
+
 import frbs
 import matplotlib.pyplot as plt
 import math
