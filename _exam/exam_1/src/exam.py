@@ -12,6 +12,7 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from utils import updateReport
 from mpl_toolkits.mplot3d import Axes3D
+import csv
 
 def plot_3d(X, Y, Z, x_size, y_size):
     x = np.reshape(X, (x_size, y_size))
@@ -77,7 +78,7 @@ def get_mf_rule():
     input_funcs = {
         "water_fr" : {
             "x1_1" : [[0,0], [0.1, 1], [1000, 0]],
-            "x1_2" : [[900,0], [1400, 1], [2000, 0]],
+            "x1_2" : [[890,0], [1400, 1], [2000, 0]],
             "x1_3" : [[1000,0], [2000, 1], [3000, 0]],
             "x1_4" : [[2000,0], [3000, 1], [4000, 0]],
             "x1_5" : [[3000,0], [4000, 1], [4000.1, 0]],
@@ -93,7 +94,7 @@ def get_mf_rule():
 
     output_funcs = {
         "power" : {
-            "y1_1": [[-30, 0], [0, 1], [30, 0]],
+            "y1_1": [[0, 0], [0.1, 1], [55, 0]],
             "y1_2" : [[0, 0], [45, 1], [90, 0]],
             "y1_3" : [[30, 0], [115, 1], [160, 0]],
         },
@@ -131,12 +132,13 @@ def get_mf_rule():
         ["water_fr=x1_5+water_lvl=x2_5", "y1_3"],
     ]
 
+
     return input_funcs, output_funcs, rules
 
 def main():
     # -----------------------------------------
-    num_pts_1, num_pts_2 = 1, 1
-    segment_num_1, segment_num_2 = 30, 20
+    num_pts_1, num_pts_2 = 2, 2
+    segment_num_1, segment_num_2 = 10, 10
     counter = 1
     total = num_pts_1 * num_pts_2 * segment_num_1 * segment_num_2
     
@@ -149,7 +151,7 @@ def main():
     # !!!: precision in FRBS() need to be adjusted base on input scale
     # ex: for scale of 100+, precision = 0.1 is good
     # ex: for scale of 0 ~ 1, precision = 0.001 is good
-    fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.1)
+    fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.05)
 
     water_fr = []
     water_lvl = []
@@ -172,6 +174,7 @@ def main():
             print("Total run: ", total, " -----------> ", counter)
             #print("water_lvl = ", m, " water_fr = ", n, " power = ", crisp)
             updateReport("/report.csv", [str(m), str(n), str(crisp)])
+            updateReport("/output_dim", [str(len(input_1)), str(len(input_2))])
             counter += 1
 
     plot_3d(water_fr, water_lvl, power, len(input_1), len(input_2))
@@ -184,10 +187,10 @@ def debug():
     #input_1, input_2 = get_input_data(input_1_size, input_2_size)
     input_funcs, output_funcs, rules = get_mf_rule()
 
-    fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.1)
+    fuzzy = frbs.FRBS(input_funcs, output_funcs, 0.05)
 
-    water_fr = 2100
-    water_lvl = 25
+    water_fr = 250
+    water_lvl = 150
     power = []
 
     x = {
@@ -204,7 +207,39 @@ def debug():
     print(x)
     print(crisp)
 
+
+def plot_output(data_path = "./report.csv", dim_path = "./output_dim.csv"):
+    water_fr = []
+    water_lvl = []
+    power = []
+    x_size = 0
+    y_size = 0
+
+    with open(data_path, 'r') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
+    with open(dim_path, 'r') as f:
+        reader = csv.reader(f)
+        dims = list(reader)
+
+    for d in data:
+        water_fr.append(float(d[0]))
+        water_lvl.append(float(d[1]))
+        power.append(float(d[2]))
+
+    for d in dims:
+        x_size += int(d[0])
+        y_size += int(d[1])
+
+    print(x_size)
+    print(y_size)
+
+    plot_3d(water_fr, water_lvl, power, x_size, y_size)
+
+
 if __name__ == '__main__':
+    #plot_output("./report.csv", "./output_dim.csv")
     main()
     #debug()
     

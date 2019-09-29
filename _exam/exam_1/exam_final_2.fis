@@ -1,5 +1,5 @@
 [System]
-Name='exam_final'
+Name='exam_final_2'
 Type='mamdani'
 Version=2.0
 NumInputs=2
@@ -12,17 +12,17 @@ AggMethod='max'
 DefuzzMethod='centroid'
 
 [Input1]
-Name='water-fr'
+Name='Water-Flow-Rate'
 Range=[0 4000]
 NumMFs=5
 MF1='mf1':'trimf',[0 0 1000]
-MF2='mf2':'trimf',[888 1395.90684544813 2000]
+MF2='mf2':'trimf',[890 1400 2000]
 MF3='mf3':'trimf',[1000 2000 3000]
 MF4='mf4':'trimf',[2000 3000 4000]
 MF5='mf5':'trimf',[3000 4000 4000]
 
 [Input2]
-Name='water-lvl'
+Name='Dam-Water-Level'
 Range=[0 170]
 NumMFs=5
 MF1='mf1':'trimf',[0 0 42.91]
@@ -32,7 +32,7 @@ MF4='mf4':'trimf',[109.562691131498 132.562691131498 158.562691131498]
 MF5='mf5':'trimf',[139.5 170 170]
 
 [Output1]
-Name='power'
+Name='Power-Output'
 Range=[0 180]
 NumMFs=3
 MF1='mf1':'trimf',[0 0 55]

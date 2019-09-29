@@ -60,6 +60,10 @@ class FRBS():
             for y, degree in evaled_rules.items():
                 output_func = self.output_func_set[output_cat][y]
                 w, cog = self.cog(output_func, self.precision, degree)
+                """                
+                print("--------- ", y, " - ", degree)
+                print("weight: ", w, " - cog: ", cog)
+                """
                 #w, cog = self.cog_2(output_func, self.precision, degree)
                 numerator += (w * cog)
                 denominator += w
