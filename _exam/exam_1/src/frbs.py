@@ -1,9 +1,14 @@
+"""
+Author: XIN LI
+"""
+# ---------------------------------- customized libs
+import linear_func
+# ----------------------------------
+# ---------------------------------- public libs
 import numpy as np
 import matplotlib.pyplot as plt
-import linear_func
 import operator
-
-# QtFuzzyLite
+# ----------------------------------
 
 class FRBS():
     def __init__(self,
@@ -27,13 +32,7 @@ class FRBS():
 
         return func_set
 
-    def mu(self, inp_x):
-        winner = max(inp_x.values())
-        key = list(inp_x.keys())[list(inp_x.values()).index(winner)]
-        return key, inp_x[key]
-
     def fuzzification(self, x, func):
-        #degrees = [0] * len(node_list)
         degrees = {}
 
         for k, v in x.items():
@@ -41,14 +40,6 @@ class FRBS():
                 y = x_f.eval_y(v)
                 if y != None and y > self.precision:
                     degrees[k + "=" + i] = y
-
-        return degrees
-
-    def cleaning(self, degrees):
-        for k in degrees.keys():
-            if degrees[k] != None:
-                if degrees[k] > 0.0 and degrees[k] < 1e-10:
-                    degrees[k] = None
 
         return degrees
 
@@ -60,11 +51,6 @@ class FRBS():
             for y, degree in evaled_rules.items():
                 output_func = self.output_func_set[output_cat][y]
                 w, cog = self.cog(output_func, self.precision, degree)
-                """                
-                print("--------- ", y, " - ", degree)
-                print("weight: ", w, " - cog: ", cog)
-                """
-                #w, cog = self.cog_2(output_func, self.precision, degree)
                 numerator += (w * cog)
                 denominator += w
 
@@ -75,10 +61,6 @@ class FRBS():
             return 0
 
     def cog(self, func, precision, degree):
-        """
-        given a complete part of a member function with a degree
-        return the cog
-        """
         numerator = 0
         denominator = 0
         weight = 0
@@ -96,21 +78,6 @@ class FRBS():
         cog = numerator / denominator
         return weight, cog
 
-    def cog_2(self, func, precision, mu):
-        weight = 0
-        cog = 0
-
-        print("---------- cog _ 2")
-        intersects = func.eval_x(mu)
-        inner_base = abs(intersects[1] - intersects[0])
-        outer_base = abs(func.range_map[1][1] - func.range_map[0][0])
-        base_ratio = inner_base / outer_base
-        integral_ratio = np.pow(base_ratio, 2)
-
-        # TODO: finish the integral method for finding COG
-
-        return weight, cog
-
     def remove_none(self, dirty_input):
         clean_input = {}
 
@@ -120,10 +87,7 @@ class FRBS():
 
         return clean_input
 
-    def rule_op(self):
-        return False
-
-    def rules_eval(self, fuzzified_input, rules, special_op = ""):
+    def rules_eval(self, fuzzified_input, rules):
         evaled_rules = {}
         clean_input = self.remove_none(fuzzified_input)
 
@@ -131,14 +95,14 @@ class FRBS():
             AND = r[0].split("+")
             OR = r[0].split("-")
 
-            # 1-to-1 operation
-            # TODO!
+            # 1-to-1 logic
             if len(AND) == 1 and len(OR) == 1:
                 try:
                     evaled_rules[r[1]] = fuzzified_input[r[0]]
                 except:
                     pass
 
+            # AND logic
             if len(AND) > 1:
                 not_fire = False
                 degrees = []
@@ -151,14 +115,9 @@ class FRBS():
 
                 if not not_fire:
                     evaled_degree = min(degrees)
-
-                    # Q4 operation
-                    if special_op == "max_prod_comp":
-                        evaled_degree = np.prod(degrees)
-
                     evaled_rules[r[1]] = evaled_degree
 
-            # TODO!
+            # OR logic
             if len(OR) > 1:
                 degrees = {}
                 try:
@@ -175,6 +134,21 @@ class FRBS():
                     pass
 
         return evaled_rules
+
+    def cog_2(self, func, precision, mu):
+        weight = 0
+        cog = 0
+
+        print("---------- cog _ 2")
+        intersects = func.eval_x(mu)
+        inner_base = abs(intersects[1] - intersects[0])
+        outer_base = abs(func.range_map[1][1] - func.range_map[0][0])
+        base_ratio = inner_base / outer_base
+        integral_ratio = np.pow(base_ratio, 2)
+
+        # TODO: finish the integral method for finding COG
+
+        return weight, cog
 
 """
 if __name__ == '__main__':
