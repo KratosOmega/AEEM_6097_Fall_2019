@@ -1,11 +1,17 @@
 from Chromosome import Chromosome
 import random
+from eval import zero_normalize
 
 def selection(population):
 	boundary = population[0].gene_boundary
 	temp_population = []
 	normalized_fitness = []
 	num_chromosome = len(population)
+
+	normalized_fitness, sorted_idx = zero_normalize(population)
+
+	"""
+	# ---------------------------------------------------------------- this block is for max
 	fitness = list((chromosome.fitness for chromosome in population))
 
 	# if sum() > 0, means there are at least one fitness < 0
@@ -18,9 +24,10 @@ def selection(population):
 		normalized_fitness = [f / sum(fitness) for f in fitness]
 
 	temp = normalized_fitness[:]
+
 	sorted_fintness_values = temp.sort(reverse = True)
 	sorted_idx = sorted(range(len(temp)), key=lambda k: temp[k])
-
+	"""
 
 	for i in range(num_chromosome):
 		temp_chromosome = Chromosome(3, boundary)

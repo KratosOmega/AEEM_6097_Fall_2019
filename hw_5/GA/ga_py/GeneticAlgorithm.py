@@ -4,6 +4,7 @@ from Chromosome import Chromosome
 from selection import selection
 from mutation import mutation
 from elitism import elitism
+from eval import zero_sort
 
 def GeneticAlgorithm(M, N, MaxGen, Pc, Pm, Er, gene_boundary, visuailzation):
     cgcurve = []
@@ -13,14 +14,12 @@ def GeneticAlgorithm(M, N, MaxGen, Pc, Pm, Er, gene_boundary, visuailzation):
     new_population = []
     
     # grab the 1st fitness
-    sorted_fintness_values = list((chromosome.fitness for chromosome in population))
-    sorted_fintness_values.sort(reverse = True)
+    sorted_fintness_values, sorted_indx = zero_sort(population)
 
     cgcurve.append(sorted_fintness_values[0])
 
     # grab the rest fitness
     for g in range (2, MaxGen):
-        print("----------------- ", g)
         for i in range (M):
             population[i].update_fitness()
 

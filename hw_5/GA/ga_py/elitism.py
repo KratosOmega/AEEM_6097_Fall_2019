@@ -1,4 +1,5 @@
 from Chromosome import Chromosome
+from eval import zero_sort
 
 def elitism(population, new_population, er):
 	boundary = population[0].gene_boundary
@@ -7,8 +8,7 @@ def elitism(population, new_population, er):
 	m = len(population)
 	elite_size = int(m * er)
 
-	fitness_list = list((chromosome.fitness for chromosome in population))
-	sorted_idx = sorted(range(len(fitness_list)), key=lambda k: fitness_list[k])
+	fitness_list, sorted_idx = zero_sort(population)
 
 	for k in range(elite_size):
 		temp_chromosome = Chromosome(3, boundary)
