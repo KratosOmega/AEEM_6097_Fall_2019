@@ -22,11 +22,55 @@ def generate_searching_space(x_space, y_space, z_space, num_step):
 
 	return searching_space
 
-def main():
-	#Problem.obj = @Sphere;
-	#Problem.nVar = 20;
+def main_segment():
+	# set to 0 if you do not want the convergence curve 
+	visualization = 1
 
-	episode = 20
+	fitness_thres = 0.05
+	coordinate_thres = 0.001
+
+	maxs_mins = []
+
+	episode = 1
+
+	# number of chromosomes (cadinate solutions)
+	M = 20
+	# number of genes (variables)
+	N = 3
+	MaxGen = 50
+	Pc = 0.85
+	Pm = 0.01
+	Er = 0.05
+	counter = 0
+	
+	searching_space = generate_searching_space([-5, 5], [-5, 5], [-5, 5], 5)
+
+	gene_boundary = []
+
+	for xs in searching_space[0]:
+		for ys in searching_space[1]:
+			for zs in searching_space[2]:
+				gene_boundary.append([xs, ys, zs])
+
+	for space in gene_boundary:
+		counter += 1
+		print("---------------------> ", counter)
+
+		for i in range(episode):
+			BestChrom  = GeneticAlgorithm(M, N, MaxGen, Pc, Pm, Er, space, visualization)
+
+			print(BestChrom)
+
+			if abs(BestChrom["fitness"]) <= fitness_thres:
+				maxs_mins.append(BestChrom)
+
+	for result in maxs_mins:
+		print("The best chromosome found: ", result["gene"])
+		print("The best fitness value: ", result["fitness"])
+
+
+def main():
+	episode = 100
 
 	# number of chromosomes (cadinate solutions)
 	M = 20
@@ -42,15 +86,16 @@ def main():
 	# set to 0 if you do not want the convergence curve 
 	visualization = 1
 
-	fitness_thres = 0.01
+	fitness_thres = 0.05
 	coordinate_thres = 0.001
 
 	maxs_mins = []
 
-
 	for i in range(episode):
 		print("ep: ---------------------> ", i)
 		BestChrom  = GeneticAlgorithm(M, N, MaxGen, Pc, Pm, Er, gene_boundary, visualization)
+
+		print(BestChrom)
 
 		if abs(BestChrom["fitness"]) <= fitness_thres:
 			maxs_mins.append(BestChrom)
@@ -61,6 +106,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+    #main_segment()
     """
     test = generate_searching_space([-5, 5], [-5, 5], [-5, 5], 5)
     print(test[0])
