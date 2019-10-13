@@ -61,20 +61,21 @@ class GeneticAlgorithm():
 
     def run(self):
         # grab the 1st fitness
-        sorted_fintness_values, sorted_indx = self.zero_sort(self.population)
+        sorted_fintness_values, sorted_idx = self.zero_sort(self.population)
 
         print("Generation : ----------------------- @ (", self.MaxGen, " - ", 1, ")")
         print("fitness --------: ", sorted_fintness_values[0])
+        for i in sorted_idx:
+            print(self.population[i].fitness)
+        print("")
 
         self.cgcurve.append(sorted_fintness_values[0])
 
         # grab the rest fitness
         for g in range (2, self.MaxGen):
             print("Generation : ----------------------- @ (", self.MaxGen, " - ", g, ")")
-            """
-            for i in range (self.M):
-                self.population[i].update_fitness()
-            """
+            self.new_population = []
+
             for i in range(0, self.M, 2):
                 # Selection
                 parent1, parent2 = self.selection()
@@ -90,9 +91,10 @@ class GeneticAlgorithm():
                 self.new_population.append(child2)
 
             # Elitism
-            self.new_population = self.elitism()
+            # replace the previous population with the newly made
+            self.population = self.elitism()
 
-            currnt_fitness = self.new_population[0].fitness
+            currnt_fitness = self.population[0].fitness
 
             self.cgcurve.append(currnt_fitness)
 
@@ -104,12 +106,17 @@ class GeneticAlgorithm():
                 self.stop_count = 0
 
             self.prev_fitness = currnt_fitness
-            # replace the previous population with the newly made
-            self.opulation = self.new_population;
 
-            if self.stop_count > 15:
+            for p in self.population:
+                print(p.fitness)
+            print("")
+
+            # reset new_population
+
+            if self.stop_count > 5:
+                #self.rand *= (1 + 0.5)
+                self.mutation_rand *= (1 + 0.5)
                 self.stop_count = 0
-                break
 
         if self.visuailzation:
             plt.plot(self.cgcurve)
