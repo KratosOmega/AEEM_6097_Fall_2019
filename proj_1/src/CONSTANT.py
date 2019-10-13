@@ -12,14 +12,14 @@ mf_space_in = [-pi, pi] # domain of input mf
 mf_size_out = 4 # num of output mf
 mf_space_out = [-1, 1] # domain of output mf
 
-M = 5
-MaxGen = 5
+M = 10
+MaxGen = 25
 pc = 0.75
 pm = 0.5
 er = 0.1
 
 draw_size = 25
-data_size = 50
+data_size = 100
 rand = -1
 mutation_rand = 0.5
 shuffle_type = "random" # h, v, random

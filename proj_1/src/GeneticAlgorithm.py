@@ -6,6 +6,7 @@ from mutation import mutation
 from elitism import elitism
 """
 from Chromosome import Chromosome
+import matplotlib.pyplot as plt
 import random
 from utils import *
 import copy
@@ -61,6 +62,10 @@ class GeneticAlgorithm():
     def run(self):
         # grab the 1st fitness
         sorted_fintness_values, sorted_indx = self.zero_sort(self.population)
+
+        print("Generation : ----------------------- @ (", self.MaxGen, " - ", 1, ")")
+        print("fitness --------: ", sorted_fintness_values[0])
+
         self.cgcurve.append(sorted_fintness_values[0])
 
         # grab the rest fitness
@@ -107,18 +112,18 @@ class GeneticAlgorithm():
                 break
 
         if self.visuailzation:
-            plt.plot(cgcurve)
+            plt.plot(self.cgcurve)
             plt.xlabel('x - generation')
             plt.ylabel('y - fitness')
             plt.title('converging graph')
             plt.show() 
 
         best_chrom = {
-            "gene": population[0].gene,
-            "fitness": population[0].fitness,
+            "gene": self.population[0].gene,
+            "fitness": self.population[0].fitness,
         }
 
-        return new_generation
+        return best_chrom
 
     def pop_init(self):
         population = []

@@ -21,8 +21,24 @@ def main():
 
     result = ga.run()
 
-    print(result["gene"])
+    print("------------------------------ input X: ")
+    for i, x in result["gene"]["input_mf"]["X"].items():
+        print(".......... : ", i)
+        print(x)
+    print("------------------------------ input Y: ")
+    for i, y in result["gene"]["input_mf"]["Y"].items():
+        print(".......... : ", i)
+        print(y)
+    print("------------------------------ output F: ")
+    for i, f in result["gene"]["output_mf"]["F"].items():
+        print(".......... : ", i)
+        print(f)
+    print("------------------------------ rule matrix: ")
+    print(result["gene"]["rule_mat"])
+    print("")
+    print("========================")
     print(result["fitness"])
+    print("========================")
 
 def debug():
     X_train, X_valid = generate_data(dim_size, dim_space, data_size, train_percent)
