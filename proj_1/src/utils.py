@@ -48,8 +48,8 @@ def init_mf(mf_prefix, mf_size, mf_space, rand = -1):
     	for i in range(1, mf_size - 1):
     		node_setup = mf[str(i)]
     		for node in node_setup:
-    			rand = uniform(-1 * rand, rand)
-    			node[0] = node[0] * (1 + rand)
+    			rand_scalar = uniform(-1 * rand, rand)
+    			node[0] = node[0] * (1 + rand_scalar)
 
     return mf
 

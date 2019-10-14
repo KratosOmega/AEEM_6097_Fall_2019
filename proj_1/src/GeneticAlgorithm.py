@@ -13,7 +13,7 @@ import copy
 
 class GeneticAlgorithm():
     """docstring for ClassName"""
-    def __init__(self, 
+    def __init__(self, is_load_gene,
         M, 
         MaxGen, 
         pc, 
@@ -33,14 +33,15 @@ class GeneticAlgorithm():
         draw_size,
         mutation_rand,
         ):
-
+        self.is_load_gene = is_load_gene
         self.M = M
         self.MaxGen = MaxGen
         self.pc = pc
         self.pm = pm
         self.er = er
         self.X = X
-        self.X_random_draw = random_draw(self.X, draw_size)
+        self.draw_size = draw_size
+        self.X_random_draw = random_draw(self.X, self.draw_size)
         self.inp, self.out = split_XY(self.X_random_draw)
         self.x_prefix = x_prefix
         self.y_prefix = y_prefix
@@ -61,18 +62,21 @@ class GeneticAlgorithm():
 
     def run(self):
         # grab the 1st fitness
-        sorted_fintness_values, sorted_idx = self.zero_sort(self.population)
+        _, sorted_idx = self.zero_sort(self.population)
 
         print("Generation : ----------------------- @ (", self.MaxGen, " - ", 1, ")")
-        print("fitness --------: ", sorted_fintness_values[0])
+        print("fitness --------: ", self.population[sorted_idx[0]].fitness)
         for i in sorted_idx:
             print(self.population[i].fitness)
         print("")
 
-        self.cgcurve.append(sorted_fintness_values[0])
+        self.cgcurve.append(self.population[sorted_idx[0]].fitness)
 
         # grab the rest fitness
-        for g in range (2, self.MaxGen):
+        for g in range (1, self.MaxGen):
+            self.X_random_draw = random_draw(self.X, self.draw_size)
+            self.inp, self.out = split_XY(self.X_random_draw)
+            
             print("Generation : ----------------------- @ (", self.MaxGen, " - ", g, ")")
             self.new_population = []
 
@@ -100,6 +104,17 @@ class GeneticAlgorithm():
 
             print("fitness --------: ", currnt_fitness)
 
+            # ################################################## Save Gene
+            if g % 5 == 0:
+                self.save_gene()
+                plt.plot(self.cgcurve)
+                plt.xlabel('x - generation')
+                plt.ylabel('y - fitness')
+                plt.title('converging graph')
+                plt.savefig('./_plot/plot.png')
+            # ################################################## Save Gene
+
+            # ################################################## Convergence Check
             if abs(self.prev_fitness - currnt_fitness) < 0.0001:
                 self.stop_count += 1
             else:
@@ -117,13 +132,14 @@ class GeneticAlgorithm():
                 #self.rand *= (1 + 0.5)
                 self.mutation_rand *= (1 + 0.5)
                 self.stop_count = 0
+            # ################################################## Convergence Check
 
         if self.visuailzation:
             plt.plot(self.cgcurve)
             plt.xlabel('x - generation')
             plt.ylabel('y - fitness')
             plt.title('converging graph')
-            plt.show() 
+            plt.savefig('./_plot/plot.png')
 
         best_chrom = {
             "gene": self.population[0].gene,
@@ -133,18 +149,21 @@ class GeneticAlgorithm():
         return best_chrom
 
     def pop_init(self):
-        population = []
+        if self.is_load_gene:
+            return self.load_gene()
+        else:
+            population = []
 
-        for m in range(self.M):
-            chromosome = Chromosome(
-                None,
-                self.x_prefix, self.y_prefix, self.f_prefix, 
-                self.mf_size_in, self.mf_space_in, self.mf_size_out, self.mf_space_out, None, self.rand
-            )
-            chromosome.update_fitness(self.inp, self.out)
-            population.append(chromosome)
+            for m in range(self.M):
+                chromosome = Chromosome(
+                    None,
+                    self.x_prefix, self.y_prefix, self.f_prefix, 
+                    self.mf_size_in, self.mf_space_in, self.mf_size_out, self.mf_space_out, None, self.rand
+                )
+                chromosome.update_fitness(self.inp, self.out)
+                population.append(chromosome)
 
-        return population
+            return population
 
     def crossover(self, parent1 , parent2):
         ancestors = [parent1, parent2]
@@ -235,10 +254,21 @@ class GeneticAlgorithm():
         return mutated
 
     def elitism(self):
+        """
+        print("--------------- Elitism spot check: ")
+        print("OLD:")
+        for i, p in enumerate(self.population):
+            print(i, " - ", p.fitness)
+        print("")
+        print("NEW")
+        for i, p in enumerate(self.new_population):
+            print(i, " - ", p.fitness)
+        print("")
+        """
         new_generation = []
 
         m = len(self.population)
-        elite_size = int(m * self.er)
+        elite_size = 1 if int(m * self.er) == 0 else int(m * self.er)
 
         _, sorted_idx = self.zero_sort(self.population)
 
@@ -268,6 +298,91 @@ class GeneticAlgorithm():
         normalized_fitness = [ele/total_weight for ele in weight_away_from_zero]
         sorted_idx = sorted(range(len(normalized_fitness)), key=lambda k: normalized_fitness[k])
         return normalized_fitness, sorted_idx
+
+    def save_gene(self, output_path = "./_saved/"):
+        for p_idx in range(len(self.population)):
+            x_data = []
+            y_data = []
+            f_data = []
+
+            gene = self.population[p_idx].gene
+            input_mf_x = gene["input_mf"]["X"]
+            input_mf_y = gene["input_mf"]["Y"]
+            output_mf_f = gene["output_mf"]["F"]
+            rule_mat = gene["rule_mat"]
+
+            x_output_path = output_path + "gene-" + str(p_idx) + "-X.npz"
+            for k, e in input_mf_x.items():
+                x_data.append(e)
+            np.savez(x_output_path, *x_data)
+
+            y_output_path = output_path + "gene-" + str(p_idx) + "-Y.npz"
+            for k, e in input_mf_y.items():
+                y_data.append(e)
+            np.savez(y_output_path, *y_data)
+
+            f_output_path = output_path + "gene-" + str(p_idx) + "-F.npz"
+            for k, e in output_mf_f.items():
+                f_data.append(e)
+            np.savez(f_output_path, *f_data)
+
+            r_output_path = output_path + "gene-" + str(p_idx) + "-R.npz"
+            np.savez(r_output_path, rule_mat=rule_mat)
+
+        print("###############################")
+        print("###      Gene Is Saved      ###")
+        print("###############################")
+
+    def load_gene(self, input_path = "./_saved/"):
+        population = []
+        input_mf = {}
+        output_mf = {}
+        rule_mat = None
+
+        for p_idx in range(self.M):
+            X = {}
+            Y = {}
+            F = {}
+
+            chromosome = Chromosome("empty",
+                self.x_prefix, self.y_prefix, self.f_prefix,
+                self.mf_size_in, self.mf_space_in, self.mf_size_out, self.mf_space_out,
+                self.shuffle_type, self.rand)
+
+            x_container = np.load(input_path + "gene-" + str(p_idx) + "-X.npz")
+            y_container = np.load(input_path + "gene-" + str(p_idx) + "-Y.npz")
+            f_container = np.load(input_path + "gene-" + str(p_idx) + "-F.npz")
+            r_container = np.load(input_path + "gene-" + str(p_idx) + "-R.npz")
+
+            x_data = [x_container[i] for i in x_container]
+            y_data = [y_container[i] for i in y_container]
+            f_data = [f_container[i] for i in f_container]
+            rule_mat = r_container["rule_mat"]
+
+            for i, x in enumerate(x_data):
+                X[str(i)] = x
+            for i, y in enumerate(y_data):
+                Y[str(i)] = y
+            for i, f in enumerate(f_data):
+                F[str(i)] = f
+
+            input_mf["X"] = X
+            input_mf["Y"] = Y
+            output_mf["F"] = F
+
+            chromosome.gene["input_mf"] = input_mf
+            chromosome.gene["output_mf"] = output_mf
+            chromosome.gene["rule_mat"] = rule_mat
+
+            chromosome.update_fitness(self.inp, self.out)
+
+            population.append(chromosome)
+
+        print("###############################")
+        print("###      Gene Is Loaded     ###")
+        print("###############################")
+
+        return population
 
 
 

@@ -28,7 +28,10 @@ class Chromosome(object):
 		output_mf = {}
 		rule_mat = {}
 
-		if ancestors == None:
+		if ancestors == "empty":
+			return {}
+
+		elif ancestors == None:
 			input_mf = {
 				self.x_prefix : init_mf("x", self.mf_size_in, self.mf_space_in, self.rand),
 				self.y_prefix : init_mf("y", self.mf_size_in, self.mf_space_in, self.rand),

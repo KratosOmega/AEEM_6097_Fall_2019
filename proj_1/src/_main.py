@@ -3,13 +3,12 @@ from utils import *
 from GeneticAlgorithm import GeneticAlgorithm
 from Chromosome import Chromosome
 import numpy as np
-
 import random
 
 def main():
     X_train, X_valid = generate_data(dim_size, dim_space, data_size, train_percent)
 
-    ga = GeneticAlgorithm(
+    ga = GeneticAlgorithm(is_load_gene,
         M, MaxGen, pc, pm, er, 
         X_train, 
         x_prefix, y_prefix, f_prefix, 
@@ -41,6 +40,7 @@ def main():
     print("========================")
 
 def debug():
+    """
     X_train, X_valid = generate_data(dim_size, dim_space, data_size, train_percent)
 
     ga = GeneticAlgorithm(
@@ -54,13 +54,36 @@ def debug():
     )
 
     pop = ga.population
-    p1, p2 = ga.selection(pop)
 
-    p1.update_fitness(ga.inp, ga.out)
+    save_gene(pop)
+    """
+    test = load_gene()
+    print(test[0].gene)
+    
+
 
 
 
 if __name__ == '__main__':
     main()
     #debug()
+
+
+    """
+    1. using sorted population for each generation gonna help?
+    """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
