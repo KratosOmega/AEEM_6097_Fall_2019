@@ -59,18 +59,22 @@ class GeneticAlgorithm():
         self.stop_count = 0
         self.prev_fitness = 0
         self.cgcurve = []
+        self.best_fitness = 0
 
     def run(self):
         # grab the 1st fitness
         _, sorted_idx = self.zero_sort(self.population)
 
+        self.best_fitness = self.population[sorted_idx[0]].fitness
+
         print("Generation : ----------------------- @ (", self.MaxGen, " - ", 1, ")")
-        print("fitness --------: ", self.population[sorted_idx[0]].fitness)
+        print("fitness --------: ", self.best_fitness)
+
         for i in sorted_idx:
             print(self.population[i].fitness)
         print("")
 
-        self.cgcurve.append(self.population[sorted_idx[0]].fitness)
+        self.cgcurve.append(self.best_fitness)
 
         # grab the rest fitness
         for g in range (1, self.MaxGen):
@@ -104,15 +108,19 @@ class GeneticAlgorithm():
 
             print("fitness --------: ", currnt_fitness)
 
-            # ################################################## Save Gene
-            if g % 5 == 0:
+            # save best genes
+            if currnt_fitness < self.best_fitness:
                 self.save_gene()
+
+            # ################################################## backup save Gene
+            if g % 5 == 0:
+                self.save_gene("./_saved_backup")
                 plt.plot(self.cgcurve)
                 plt.xlabel('x - generation')
                 plt.ylabel('y - fitness')
                 plt.title('converging graph')
                 plt.savefig('./_plot/plot.png')
-            # ################################################## Save Gene
+            # ################################################## backup save Gene
 
             # ################################################## Convergence Check
             if abs(self.prev_fitness - currnt_fitness) < 0.0001:

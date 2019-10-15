@@ -117,69 +117,11 @@ class FRBS():
                 temp[x_k + "," +y_k] = min(x, y)
 
         for f_k, f in temp.items():
+            print(f_k)
             idx = f_k.split(",")
             x_i = int(idx[0])
-            y_i = int(idx[0])
+            y_i = int(idx[1])
             evaled_rules[int(rule_mat[x_i, y_i])] = f
-
-        return evaled_rules
-
-    def rules_eval(self, fuzzified_input, rules, special_op = ""):
-        evaled_rules = {}
-        clean_input = self.remove_none(fuzzified_input)
-
-        for r in rules:
-            AND = r[0].split("+")
-            OR = r[0].split("-")
-
-            # 1-to-1 operation
-            # TODO!
-            if len(AND) == 1 and len(OR) == 1:
-                try:
-                    evaled_rules[r[1]] = fuzzified_input[r[0]]
-                except:
-                    pass
-
-            if len(AND) > 1:
-                not_fire = False
-                degrees = []
-                for p in AND:
-                    try:
-                        degrees.append(fuzzified_input[p])
-                    except:
-                        not_fire = True
-                        pass
-
-                if not not_fire:
-                    evaled_degree = min(degrees)
-
-                    # Q4 operation
-                    if special_op == "max_prod_comp":
-                        evaled_degree = np.prod(degrees)
-
-                    evaled_rules[r[1]] = evaled_degree
-
-            # TODO!
-            if len(OR) > 1:
-                degrees = {}
-                try:
-                    """
-                    for p in OR:
-                        degrees.append(clean_input[p])
-                    evaled_degree = max(degrees)
-                    evaled_rules.append([r[1], evaled_degree])
-                    """
-                    for p in OR:
-                        if p in clean_input.keys():
-                            if clean_input[p] > self.precision:
-                                degrees[p] = clean_input[p]
-
-                    if len(degrees) != 0:
-                        op = max(degrees.values())
-                        key = list(degrees.keys())[list(degrees.values()).index(op)]
-                        evaled_rules.append([r[1], clean_input[key]])
-                except:
-                    pass
 
         return evaled_rules
 
