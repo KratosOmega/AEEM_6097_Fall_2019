@@ -67,7 +67,7 @@ class GeneticAlgorithm():
 
         self.best_fitness = self.population[sorted_idx[0]].fitness
 
-        print("Generation : ----------------------- @ (", self.MaxGen, " - ", 1, ")")
+        print("Generation : ----------------------- @ (", self.MaxGen, " - ", 0, ")")
         print("fitness --------: ", self.best_fitness)
 
         for i in sorted_idx:
@@ -114,7 +114,7 @@ class GeneticAlgorithm():
 
             # ################################################## backup save Gene
             if g % 5 == 0:
-                self.save_gene("./_saved_backup")
+                self.save_gene("./_saved_backup/")
                 plt.plot(self.cgcurve)
                 plt.xlabel('x - generation')
                 plt.ylabel('y - fitness')
@@ -202,43 +202,39 @@ class GeneticAlgorithm():
     def selection(self):
         temp_population = []
         normalized_fitness = []
+        sorted_nf = []
+        spin_wheel = []
         num_chromosome = len(self.population)
+        parent1_idx = -1
+        parent2_idx = -1
 
         normalized_fitness, sorted_idx = self.zero_normalize(self.population)
 
         for i in range(num_chromosome):
             temp_chromosome = copy.deepcopy(self.population[sorted_idx[i]])
             temp_chromosome.normalized_fitness = normalized_fitness[sorted_idx[i]]
+            sorted_nf.append(temp_chromosome.normalized_fitness)
             temp_population.append(temp_chromosome)
 
-        cum_sum = [0] * num_chromosome
+        l = 0
+        for snf in sorted_nf:
+            r = snf + l
+            spin_wheel.append([l, r])
+            l = r
 
-        for i in range(num_chromosome):
-            cum_sum[i] = sum(p.normalized_fitness for p in temp_population[i : ])
+        r = uniform(0, 1)
 
-        r = uniform(0 ,1)
-
-        parent1_idx = num_chromosome - 1
-
-        for i in range(len(cum_sum)):
-            if r > cum_sum[i]:
-                parent1_idx = i - 1
+        for i, sw in enumerate(spin_wheel):
+            if sw[0] < r and r < sw[1]:
+                parent1_idx = i
                 break
-
-        parent2_idx = parent1_idx
-
-        while_loop_stop = 0
-
-        while parent2_idx == parent1_idx:
-            while_loop_stop = while_loop_stop + 1
+        
+        while parent2_idx == -1:
             r = uniform(0, 1)
-            if while_loop_stop > 20:
-                break;
-
-            for i in range(len(cum_sum)):
-                if r > cum_sum[i]:
-                    parent2_idx = i - 1
-                    break;
+            for i, sw in enumerate(spin_wheel):
+                if i != parent1_idx and (sw[0] < r and r < sw[1]):
+                    parent2_idx = i
+                    break
 
         parent1 = temp_population[parent1_idx]
         parent2 = temp_population[parent2_idx]
@@ -287,7 +283,6 @@ class GeneticAlgorithm():
 
         for i in range(elite_size, m):
             temp_chromosome = copy.deepcopy(self.new_population[sorted_idx[i]])
-            temp_chromosome.update_fitness(self.inp, self.out)
             new_generation.append(temp_chromosome)
 
         return new_generation

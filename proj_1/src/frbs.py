@@ -58,8 +58,8 @@ class FRBS():
             numerator = 0
             denominator = 0
 
-            for y, degree in evaled_rules.items():
-                output_func = self.output_func_set[output_cat][str(y)]
+            for f, degree in evaled_rules.items():
+                output_func = self.output_func_set[output_cat][str(f)]
                 w, cog = self.cog(output_func, self.precision, degree)
                 numerator += (w * cog)
                 denominator += w
@@ -106,23 +106,19 @@ class FRBS():
         return False
 
     def rule_mat_eval(self, fuzzified_input, rule_mat):
-        temp = {}
         evaled_rules = {}
-
         x_pool = fuzzified_input["X"]
         y_pool = fuzzified_input["Y"]
 
         for x_k, x in x_pool.items():
             for y_k, y in y_pool.items():
-                temp[x_k + "," +y_k] = min(x, y)
-
-        for f_k, f in temp.items():
-            print(f_k)
-            idx = f_k.split(",")
-            x_i = int(idx[0])
-            y_i = int(idx[1])
-            evaled_rules[int(rule_mat[x_i, y_i])] = f
-
+                output_func_idx = int(rule_mat[int(x_k), int(y_k)])
+                degree = min(x, y)
+                if output_func_idx in evaled_rules.keys():
+                    if evaled_rules[output_func_idx] < degree:
+                        evaled_rules[output_func_idx] = degree
+                else:
+                    evaled_rules[output_func_idx] = degree
         return evaled_rules
 
 """
