@@ -137,6 +137,31 @@ def shuffle_random(A, B):
 	return shuffled
 
 
+def generate_data_csv(dim_size, dim_space, data_size, train_percent, output_path = "./_data/"):
+	X_train, X_valid = generate_data(dim_size, dim_space, data_size, train_percent)
+
+	train_output_path = output_path + "train.npz"
+	np.savez(train_output_path, X_train)
+
+	valid_output_path = output_path + "valid.npz"
+	np.savez(valid_output_path, X_valid)
+
+	print("###############################")
+	print("###      Data Is Saved      ###")
+	print("###############################")
+
+
+def load_data_csv(load_path = "./_data/"):
+
+	train = np.load(load_path + "train.npz")
+	valid = np.load(load_path + "valid.npz")
+	X_train = [train[i] for i in train]
+	X_valid = [valid[i] for i in valid]
+
+	return X_train, X_valid
+
+
+
 
 
 
