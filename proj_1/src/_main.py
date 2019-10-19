@@ -15,43 +15,51 @@ def main():
 
 	ga = GeneticAlgorithm(is_load_gene,
 		M, MaxGen, pc, pm, er, 
-		X_train, 
+		X_train,
+		X_valid,
 		x_prefix, y_prefix, f_prefix, 
 		mf_size_in, mf_space_in, mf_size_out, mf_space_out, 
 		rand, shuffle_type, visuailzation,
 		draw_size,
 		mutation_rand,
+		is_train,
 	)
 
 	result = ga.run()
 
-	print("------------------------------ input X: ")
-	for i, x in result["gene"]["input_mf"]["X"].items():
-		print(".......... : ", i)
-		print(x)
+	if is_train:
+		print("------------------------------ input X: ")
+		for i, x in result["gene"]["input_mf"]["X"].items():
+			print(".......... : ", i)
+			print(x)
 
-	print("------------------------------ input Y: ")
-	for i, y in result["gene"]["input_mf"]["Y"].items():
-		print(".......... : ", i)
-		print(y)
-	print("------------------------------ output F: ")
-	for i, f in result["gene"]["output_mf"]["F"].items():
-		print(".......... : ", i)
-		print(f)
+		print("------------------------------ input Y: ")
+		for i, y in result["gene"]["input_mf"]["Y"].items():
+			print(".......... : ", i)
+			print(y)
+		print("------------------------------ output F: ")
+		for i, f in result["gene"]["output_mf"]["F"].items():
+			print(".......... : ", i)
+			print(f)
 
-	print("------------------------------ rule matrix: ")
-	print(result["gene"]["rule_mat"])
-	print("")
-	print("========================")
-	print(result["fitness"])
-	print("========================")
+		print("------------------------------ rule matrix: ")
+		print(result["gene"]["rule_mat"])
+		print("")
+		print("========================")
+		print(result["fitness"])
+		print("========================")
+
+	else:
+		print("---------------------- Validation reult: ")
+		print(result)
 
 def debug():
 	# ------------------ data action
-	#data_action = "load"
-	data_action = "generate"
-	#data_action = "reset"
+	#data_action = "generate"
+	data_action = "reset"
+	data(data_action)
 
+	data_action = "load"
 	X_train, X_valid = data(data_action)
 
 	print(X_train)
@@ -143,8 +151,8 @@ def load_gene(input_path = "./_saved/"):
 
 
 if __name__ == '__main__':
-    #main()
-    debug()
+    main()
+    #debug()
     #show_best_gene()
     #generate_data_csv()
 

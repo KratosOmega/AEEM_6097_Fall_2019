@@ -19,7 +19,8 @@ class GeneticAlgorithm():
         pc, 
         pm, 
         er, 
-        X,
+        X_t,
+        X_v,
         x_prefix, 
         y_prefix, 
         f_prefix, 
@@ -32,6 +33,7 @@ class GeneticAlgorithm():
         visuailzation, 
         draw_size,
         mutation_rand,
+        is_train,
         ):
         self.is_load_gene = is_load_gene
         self.M = M
@@ -39,10 +41,11 @@ class GeneticAlgorithm():
         self.pc = pc
         self.pm = pm
         self.er = er
-        self.X = X
+        self.X_t = X_t
+        self.X_v = X_v
         self.draw_size = draw_size
-        self.X_random_draw = random_draw(self.X, self.draw_size)
-        self.inp, self.out = split_XY(self.X_random_draw)
+        self.X_random_draw = random_draw(self.X_t, self.draw_size)
+        self.inp, self.out = split_XY(self.X_t)
         self.x_prefix = x_prefix
         self.y_prefix = y_prefix
         self.f_prefix = f_prefix
@@ -60,101 +63,113 @@ class GeneticAlgorithm():
         self.prev_fitness = 0
         self.cgcurve = []
         self.best_fitness = 0
+        self.is_train = is_train
 
     def run(self):
-        # grab the 1st fitness
-        _, sorted_idx = self.zero_sort(self.population)
+        if self.is_train:
+            _, sorted_idx = self.zero_sort(self.population)
 
-        self.best_fitness = self.population[sorted_idx[0]].fitness
+            self.best_fitness = self.population[sorted_idx[0]].fitness
 
-        print("Generation : ----------------------- @ (", self.MaxGen, " - ", 0, ")")
-        print("fitness --------: ", self.best_fitness)
+            print("Generation : ----------------------- @ (", self.MaxGen, " - ", 0, ")")
+            print("fitness --------: ", self.best_fitness)
 
-        for i in sorted_idx:
-            print(self.population[i].fitness)
-        print("")
+            for i in sorted_idx:
+                print(self.population[i].fitness)
+            print("")
 
-        self.cgcurve.append(self.best_fitness)
+            self.cgcurve.append(self.best_fitness)
 
-        # grab the rest fitness
-        for g in range (1, self.MaxGen):
-            self.X_random_draw = random_draw(self.X, self.draw_size)
-            self.inp, self.out = split_XY(self.X_random_draw)
-            
-            print("Generation : ----------------------- @ (", self.MaxGen, " - ", g, ")")
-            self.new_population = []
-
-            for i in range(0, self.M, 2):
-                # Selection
-                parent1, parent2 = self.selection()
+            # grab the rest fitness
+            for g in range (1, self.MaxGen):
+                self.X_random_draw = random_draw(self.X_t, self.draw_size)
+                self.inp, self.out = split_XY(self.X_random_draw)
                 
-                # Crossover
-                child1 , child2 = self.crossover(parent1 , parent2)
+                print("Generation : ----------------------- @ (", self.MaxGen, " - ", g, ")")
+                self.new_population = []
+
+                for i in range(0, self.M, 2):
+                    # Selection
+                    parent1, parent2 = self.selection()
+                    
+                    # Crossover
+                    child1 , child2 = self.crossover(parent1 , parent2)
+                    
+                    # Mutation
+                    child1 = self.mutation(child1)
+                    child2 = self.mutation(child2)
                 
-                # Mutation
-                child1 = self.mutation(child1)
-                child2 = self.mutation(child2)
-            
-                self.new_population.append(child1)
-                self.new_population.append(child2)
+                    self.new_population.append(child1)
+                    self.new_population.append(child2)
 
-            # Elitism
-            # replace the previous population with the newly made
-            self.population = self.elitism()
+                # Elitism
+                # replace the previous population with the newly made
+                self.population = self.elitism()
 
-            currnt_fitness = self.population[0].fitness
+                currnt_fitness = self.population[0].fitness
 
-            self.cgcurve.append(currnt_fitness)
+                self.cgcurve.append(currnt_fitness)
 
-            print("fitness --------: ", currnt_fitness)
+                print("fitness --------: ", currnt_fitness)
 
-            # save best genes
-            if currnt_fitness < self.best_fitness:
-                self.save_gene()
+                # save best genes
+                if currnt_fitness < self.best_fitness:
+                    self.save_gene()
 
-            # ################################################## backup save Gene
-            if g % 5 == 0:
-                self.save_gene("./_saved_backup/")
+                # ################################################## backup save Gene
+                if g % 5 == 0:
+                    self.save_gene("./_saved_backup/")
+                    plt.plot(self.cgcurve)
+                    plt.xlabel('x - generation')
+                    plt.ylabel('y - fitness')
+                    plt.title('converging graph')
+                    plt.savefig('./_plot/plot.png')
+                # ################################################## backup save Gene
+
+                # ################################################## Convergence Check
+                if abs(self.prev_fitness - currnt_fitness) < 0.0001:
+                    self.stop_count += 1
+                else:
+                    self.stop_count = 0
+
+                self.prev_fitness = currnt_fitness
+
+                for p in self.population:
+                    print(p.fitness)
+                print("")
+
+                # reset new_population
+
+                if self.stop_count > 5:
+                    #self.rand *= (1 + 0.5)
+                    self.mutation_rand *= (1 + 0.5)
+                    self.stop_count = 0
+                # ################################################## Convergence Check
+
+            if self.visuailzation:
                 plt.plot(self.cgcurve)
                 plt.xlabel('x - generation')
                 plt.ylabel('y - fitness')
                 plt.title('converging graph')
                 plt.savefig('./_plot/plot.png')
-            # ################################################## backup save Gene
 
-            # ################################################## Convergence Check
-            if abs(self.prev_fitness - currnt_fitness) < 0.0001:
-                self.stop_count += 1
-            else:
-                self.stop_count = 0
+            best_chrom = {
+                "gene": self.population[0].gene,
+                "fitness": self.population[0].fitness,
+            }
 
-            self.prev_fitness = currnt_fitness
+            return best_chrom
+        else:
+            # using entire training data to filter the best gene out
+            _, sorted_idx = self.zero_sort(self.population)
+            best_chrom = self.population[sorted_idx[0]]
+            print("---------------------- Training reult: ")
+            print(best_chrom.fitness)
+            # using entire validationg data to valid performance of best gene
+            self.inp, self.out = split_XY(self.X_v)
+            best_chrom.update_fitness(self.inp, self.out)
 
-            for p in self.population:
-                print(p.fitness)
-            print("")
-
-            # reset new_population
-
-            if self.stop_count > 5:
-                #self.rand *= (1 + 0.5)
-                self.mutation_rand *= (1 + 0.5)
-                self.stop_count = 0
-            # ################################################## Convergence Check
-
-        if self.visuailzation:
-            plt.plot(self.cgcurve)
-            plt.xlabel('x - generation')
-            plt.ylabel('y - fitness')
-            plt.title('converging graph')
-            plt.savefig('./_plot/plot.png')
-
-        best_chrom = {
-            "gene": self.population[0].gene,
-            "fitness": self.population[0].fitness,
-        }
-
-        return best_chrom
+            return best_chrom.fitness
 
     def pop_init(self):
         if self.is_load_gene:
