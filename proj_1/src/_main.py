@@ -23,6 +23,7 @@ def main():
 		draw_size,
 		mutation_rand,
 		is_train,
+		cog_precision,
 	)
 
 	result = ga.run()
@@ -110,7 +111,7 @@ def load_gene(input_path = "./_saved/"):
 		Y = {}
 		F = {}
 
-	chromosome = Chromosome("empty",
+	chromosome = Chromosome("empty", cog_precision,
 		x_prefix, y_prefix, f_prefix,
 		mf_size_in, mf_space_in, mf_size_out, mf_space_out,
 		shuffle_type, -1)
@@ -151,8 +152,9 @@ def load_gene(input_path = "./_saved/"):
 
 
 if __name__ == '__main__':
-    main()
-    #debug()
+    main() # main run()
+    #debug() # testing & generate dataset
+
     #show_best_gene()
     #generate_data_csv()
 

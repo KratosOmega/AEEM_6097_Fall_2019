@@ -6,10 +6,12 @@ from statistics import mean
 class Chromosome(object):
 	def __init__(self, 
 		ancestors, 
+		cog_precision,
 		x_prefix = "X", y_prefix = "Y", f_prefix = "F", 
 		mf_size_in = 0, mf_space_in = [], mf_size_out = 0, mf_space_out =[], 
 		shuffle_type = "random", rand = -1):
 		#self.target = Target_Function()
+		self.cog_precision = cog_precision
 		self.x_prefix = x_prefix
 		self.y_prefix = y_prefix
 		self.f_prefix = f_prefix
@@ -68,7 +70,7 @@ class Chromosome(object):
 		output_mf = self.gene["output_mf"]
 		rule_mat = self.gene["rule_mat"]
 
-		fuzzy = FRBS(input_mf, output_mf, 0.001)
+		fuzzy = FRBS(input_mf, output_mf, self.cog_precision)
 
 		for i in range(len(X)):
 			x = {
@@ -79,6 +81,7 @@ class Chromosome(object):
 			fuzzified_input = fuzzy.fuzzification(x, fuzzy.input_func_set)
 			evaled_rules = fuzzy.rule_mat_eval(fuzzified_input, rule_mat)
 			crisp = fuzzy.defuzzification(evaled_rules, "F")
+
 			h_train.append(crisp)
 
 		for i in range(len(h_train)):

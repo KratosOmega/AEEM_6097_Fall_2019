@@ -34,8 +34,10 @@ class GeneticAlgorithm():
         draw_size,
         mutation_rand,
         is_train,
+        cog_precision,
         ):
         self.is_load_gene = is_load_gene
+        self.cog_precision = cog_precision
         self.M = M
         self.MaxGen = MaxGen
         self.pc = pc
@@ -179,7 +181,7 @@ class GeneticAlgorithm():
 
             for m in range(self.M):
                 chromosome = Chromosome(
-                    None,
+                    None, self.cog_precision,
                     self.x_prefix, self.y_prefix, self.f_prefix, 
                     self.mf_size_in, self.mf_space_in, self.mf_size_out, self.mf_space_out, None, self.rand
                 )
@@ -191,11 +193,11 @@ class GeneticAlgorithm():
     def crossover(self, parent1 , parent2):
         ancestors = [parent1, parent2]
 
-        child1 = Chromosome(ancestors, self.x_prefix, self.y_prefix, self.f_prefix, 
+        child1 = Chromosome(ancestors, self.cog_precision, self.x_prefix, self.y_prefix, self.f_prefix, 
         self.mf_size_in, self.mf_space_in, self.mf_size_out, self.mf_space_out, 
         self.shuffle_type, self.rand)
 
-        child2 = Chromosome(ancestors, self.x_prefix, self.y_prefix, self.f_prefix, 
+        child2 = Chromosome(ancestors, self.cog_precision, self.x_prefix, self.y_prefix, self.f_prefix, 
         self.mf_size_in, self.mf_space_in, self.mf_size_out, self.mf_space_out, 
         self.shuffle_type, self.rand)
 
@@ -362,7 +364,7 @@ class GeneticAlgorithm():
             Y = {}
             F = {}
 
-            chromosome = Chromosome("empty",
+            chromosome = Chromosome("empty", self.cog_precision,
                 self.x_prefix, self.y_prefix, self.f_prefix,
                 self.mf_size_in, self.mf_space_in, self.mf_size_out, self.mf_space_out,
                 self.shuffle_type, self.rand)
