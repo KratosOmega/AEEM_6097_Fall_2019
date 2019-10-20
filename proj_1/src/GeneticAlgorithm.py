@@ -68,6 +68,11 @@ class GeneticAlgorithm():
         self.is_train = is_train
 
     def run(self):
+        print("################### Data Set ###################")
+        print("### input:  ", self.inp.shape)
+        print("### output: ", self.inp.shape)
+        print("################################################")
+
         if self.is_train:
             _, sorted_idx = self.zero_sort(self.population)
 
@@ -116,10 +121,11 @@ class GeneticAlgorithm():
 
                 # save best genes
                 if currnt_fitness < self.best_fitness:
+                    self.best_fitness = currnt_fitness
                     self.save_gene()
 
                 # ################################################## backup save Gene
-                if g % 5 == 0:
+                if g % 10 == 0:
                     self.save_gene("./_saved_backup/")
                     plt.plot(self.cgcurve)
                     plt.xlabel('x - generation')
