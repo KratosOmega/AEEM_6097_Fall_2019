@@ -19,7 +19,7 @@ cog_precision = 0.1 #0.01
 # ------------------------------------------ training setup
 MaxGen = 1000
 pc = 0.75
-pm = 0.25
+pm = 0.50
 er = 0.3
 
 draw_size = 100
