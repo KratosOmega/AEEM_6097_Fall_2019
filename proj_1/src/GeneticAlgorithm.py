@@ -134,7 +134,7 @@ class GeneticAlgorithm():
                     self.save_gene()
 
                 # ################################################## backup save Gene
-                if g % 10 == 0:
+                if g % 5 == 0:
                     self.save_gene("./_saved_backup/")
                     plt.plot(self.cgcurve)
                     plt.xlabel('x - generation')

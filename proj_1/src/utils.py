@@ -50,26 +50,19 @@ def init_mf(mf_prefix, mf_size, mf_space, rand = -1):
     		for node in node_setup:
     			rand_scalar = choice([-1 * rand, rand])
     			node[0] = node[0] * (1 + rand_scalar)
-
     return mf
 
 def mutate_mf(mf, rand):
-	mf_size = len(mf) - 1
-
-	rand_scalar = choice([-1 * rand, rand])
-	mf[str(0)][0][0] * (1 + rand_scalar)
-	mf[str(0)][2][0] * (1 + rand_scalar)
-
-	rand_scalar = choice([-1 * rand, rand])
-	mf[str(mf_size)][0][0] * (1 + rand_scalar)
-	mf[str(mf_size)][2][0] * (1 + rand_scalar)
-
-	for i in range(1, mf_size - 1):
-		node_setup = mf[str(i)]
-		for node in node_setup:
+	for i in range(len(mf)):
+		if i == 0 or i == len(mf) - 1:
 			rand_scalar = choice([-1 * rand, rand])
-			node[0] = node[0] * (1 + rand_scalar)
-
+			mag = (abs(mf[str(i)][2][0] - mf[str(i)][0][0]) / 2) * (1 + rand_scalar)
+			mf[str(i)][0][0] -= mag
+			mf[str(i)][2][0] += mag
+		else:
+			for n in range(3):
+				rand_scalar = choice([-1 * rand, rand])
+				mf[str(i)][n][0] *= (1 + rand_scalar)
 	return mf    
 
 def init_rule(x_size, y_size, f_size):

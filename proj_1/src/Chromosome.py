@@ -115,13 +115,9 @@ class Chromosome(object):
 			}
 		elif geneType == "output_mf":
 			mf_f = copy.deepcopy(self.gene[geneType][self.f_prefix])
-			print(mf_f)
-
 			self.gene[geneType] = {
 				self.f_prefix : mutate_mf(mf_f, mutation_rand)
 			}
-			print(self.gene[geneType][self.f_prefix])
-
 
 
 
