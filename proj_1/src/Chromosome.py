@@ -65,7 +65,6 @@ class Chromosome(object):
 	
 	def update_fitness(self, X, Y):
 		diff = []
-		h_train = []
 		input_mf = self.gene["input_mf"]
 		output_mf = self.gene["output_mf"]
 		rule_mat = self.gene["rule_mat"]
@@ -82,10 +81,7 @@ class Chromosome(object):
 			evaled_rules = fuzzy.rule_mat_eval(fuzzified_input, rule_mat)
 			crisp = fuzzy.defuzzification(evaled_rules, "F")
 
-			h_train.append(crisp)
-
-		for i in range(len(h_train)):
-			diff.append(abs(h_train[i] - Y[i]))
+			diff.append(abs(crisp - Y[i]))
 
 		avg = mean(diff)
 

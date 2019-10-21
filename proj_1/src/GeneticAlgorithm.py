@@ -58,6 +58,7 @@ class GeneticAlgorithm():
         self.rand = rand
         self.shuffle_type = shuffle_type
         self.mutation_rand = mutation_rand
+        self.mutation_rand_plus = self.mutation_rand
         self.visuailzation = visuailzation
         self.population = self.pop_init()
         self.new_population = []
@@ -65,18 +66,20 @@ class GeneticAlgorithm():
         self.prev_fitness = 0
         self.cgcurve = []
         self.best_fitness = 0
+        self.best_gene = None
         self.is_train = is_train
 
     def run(self):
         print("################### Data Set ###################")
         print("### input:  ", self.inp.shape)
-        print("### output: ", self.inp.shape)
+        print("### output: ", self.out.shape)
         print("################################################")
 
         if self.is_train:
             _, sorted_idx = self.zero_sort(self.population)
 
             self.best_fitness = self.population[sorted_idx[0]].fitness
+            self.best_gene = self.population[sorted_idx[0]]
 
             print("Generation : ----------------------- @ (", self.MaxGen, " - ", 0, ")")
             print("fitness --------: ", self.best_fitness)
@@ -89,8 +92,13 @@ class GeneticAlgorithm():
 
             # grab the rest fitness
             for g in range (1, self.MaxGen):
+                self.badkid_rm()
+
                 self.X_random_draw = random_draw(self.X_t, self.draw_size)
-                self.inp, self.out = split_XY(self.X_random_draw)
+                #self.inp, self.out = split_XY(self.X_random_draw) # train on random selected X_train
+                self.inp, self.out = split_XY(self.X_t) # train on entire X_train
+
+                self.badkid_rm()
                 
                 print("Generation : ----------------------- @ (", self.MaxGen, " - ", g, ")")
                 self.new_population = []
@@ -122,6 +130,7 @@ class GeneticAlgorithm():
                 # save best genes
                 if currnt_fitness < self.best_fitness:
                     self.best_fitness = currnt_fitness
+                    self.best_gene = self.population[0]
                     self.save_gene()
 
                 # ################################################## backup save Gene
@@ -139,6 +148,7 @@ class GeneticAlgorithm():
                     self.stop_count += 1
                 else:
                     self.stop_count = 0
+                    self.mutation_rand_plus = self.mutation_rand
 
                 self.prev_fitness = currnt_fitness
 
@@ -148,9 +158,11 @@ class GeneticAlgorithm():
 
                 # reset new_population
 
-                if self.stop_count > 5:
-                    #self.rand *= (1 + 0.5)
-                    self.mutation_rand *= (1 + 0.5)
+                if self.stop_count > 10:
+                    if self.mutation_rand == self.mutation_rand_plus:
+                        self.mutation_rand_plus = self.mutation_rand * (1 + 0.1)
+                    else:
+                        self.mutation_rand_plus *= (1 + 0.1)
                     self.stop_count = 0
                 # ################################################## Convergence Check
 
@@ -411,10 +423,10 @@ class GeneticAlgorithm():
         return population
 
 
-
-
-
-
-
+    def badkid_rm(self):
+        for i in range(len(self.population)):
+            while abs(self.population[i].fitness) > 6:
+                print("------------: remove badkid")
+                self.population[i] = self.mutation(self.best_gene)
 
 
