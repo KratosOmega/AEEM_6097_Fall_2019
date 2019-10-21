@@ -2,6 +2,7 @@ import random
 from frbs import FRBS
 from utils import *
 from statistics import mean
+from math import *
 
 class Chromosome(object):
 	def __init__(self, 
@@ -81,7 +82,18 @@ class Chromosome(object):
 			evaled_rules = fuzzy.rule_mat_eval(fuzzified_input, rule_mat)
 			crisp = fuzzy.defuzzification(evaled_rules, "F")
 
-			diff.append(abs(crisp - Y[i]))
+                        # ########################################################## pick one from below for fitness calculation
+                        """
+                        # ---------------------------------------------------------- diff of output only
+                        diff.append(abs(crisp - Y[i]))
+                        # ----------------------------------------------------------
+                        """
+                        # ---------------------------------------------------------- diff of L2 Norm
+                        h_l2 = sqrt(X[i][0] * X[i][0] + X[i][1] * X[i][1] + crisp * crisp)
+                        t_l2 = sqrt(X[i][0] * X[i][0] + X[i][1] * X[i][1] + Y[i] * Y[i])
+                        diff.append(abs(h_l2 - t_l2))
+                        # ----------------------------------------------------------
+                        # ##########################################################
 
 		avg = mean(diff)
 

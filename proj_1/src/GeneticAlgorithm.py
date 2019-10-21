@@ -160,8 +160,10 @@ class GeneticAlgorithm():
 
                 if self.stop_count > 10:
                     if self.mutation_rand == self.mutation_rand_plus:
+                        print("increase mutation_rand_plus")
                         self.mutation_rand_plus = self.mutation_rand * (1 + 0.1)
                     else:
+                        print("reset mutation_rand_plus")
                         self.mutation_rand_plus *= (1 + 0.1)
                     self.stop_count = 0
                 # ################################################## Convergence Check
