@@ -48,10 +48,29 @@ def init_mf(mf_prefix, mf_size, mf_space, rand = -1):
     	for i in range(1, mf_size - 1):
     		node_setup = mf[str(i)]
     		for node in node_setup:
-    			rand_scalar = uniform(-1 * rand, rand)
+    			rand_scalar = choice([-1 * rand, rand])
     			node[0] = node[0] * (1 + rand_scalar)
 
     return mf
+
+def mutate_mf(mf, rand):
+	mf_size = len(mf) - 1
+
+	rand_scalar = choice([-1 * rand, rand])
+	mf[str(0)][0][0] * (1 + rand_scalar)
+	mf[str(0)][2][0] * (1 + rand_scalar)
+
+	rand_scalar = choice([-1 * rand, rand])
+	mf[str(mf_size)][0][0] * (1 + rand_scalar)
+	mf[str(mf_size)][2][0] * (1 + rand_scalar)
+
+	for i in range(1, mf_size - 1):
+		node_setup = mf[str(i)]
+		for node in node_setup:
+			rand_scalar = choice([-1 * rand, rand])
+			node[0] = node[0] * (1 + rand_scalar)
+
+	return mf    
 
 def init_rule(x_size, y_size, f_size):
 	rule_mat = np.zeros((x_size, y_size))
@@ -62,12 +81,25 @@ def init_rule(x_size, y_size, f_size):
 
 	return rule_mat
 
+def mutate_rule(x_size, y_size, f_size, rule_mat, rand):
+	for x in range(x_size):
+		for y in range(y_size):
+			if uniform(0, 1) < rand:
+				rule_mat[x, y] = randrange(f_size)
+	return rule_mat
+
 def inherit_mf(mfType, geneType, ancestors):
 	comb_gene = {}
 	# copy gene without reference
 	gene1 = ancestors[0].gene[mfType][geneType]
 	gene2 = ancestors[1].gene[mfType][geneType]
 
+	if uniform(0, 1) > 0.5:
+		return gene1
+	else:
+		return gene2
+
+	"""
 	keys = gene1.keys()
 
 	for k in keys:
@@ -77,6 +109,7 @@ def inherit_mf(mfType, geneType, ancestors):
 		gene1_cp[:,0] *= beta
 		gene2_cp[:,0] *= (1 - beta)
 		comb_gene[k] = np.vstack((gene1_cp[:,0] + gene2_cp[:,0], gene1_cp[:,1])).T
+	"""
 
 	return comb_gene
 
@@ -84,12 +117,20 @@ def inherit_rule(ancestors, shuffle_type):
 	A = copy.deepcopy(ancestors[0].gene["rule_mat"])
 	B = copy.deepcopy(ancestors[1].gene["rule_mat"])
 
+	if uniform(0, 1) > 0.5:
+		return A
+	else:
+		return B
+
+	"""
+
 	if shuffle_type == "v":
 		return shuffle_v(A, B)
 	elif shuffle_type == "h":
 		return shuffle_h(A, B)
 	elif shuffle_type == "random":
 		return shuffle_random(A, B)
+	"""
 
 def random_draw(data, draw_size):
 	idx = np.random.randint(data.shape[0], size = draw_size)
@@ -159,9 +200,4 @@ def load_data_csv(load_path = "./_data/"):
 	X_valid = [valid[i] for i in valid]
 
 	return X_train, X_valid
-
-
-
-
-
 

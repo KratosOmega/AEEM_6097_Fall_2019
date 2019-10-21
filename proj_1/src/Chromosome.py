@@ -83,7 +83,6 @@ class Chromosome(object):
 			crisp = fuzzy.defuzzification(evaled_rules, "F")
 
 			# ########################################################## pick one from below for fitness calculation
-			"""
 			# ---------------------------------------------------------- diff of output only
 			diff.append(abs(crisp - Y[i]))
 			# ----------------------------------------------------------
@@ -93,6 +92,7 @@ class Chromosome(object):
 			t_l2 = sqrt(X[i][0] * X[i][0] + X[i][1] * X[i][1] + Y[i] * Y[i])
 			diff.append(abs(h_l2 - t_l2))
 			# ----------------------------------------------------------
+			"""
 			# ##########################################################
 
 		avg = mean(diff)
@@ -102,16 +102,25 @@ class Chromosome(object):
 
 	def mutate_gene(self, geneType, mutation_rand):
 		if geneType == "rule_mat":
-			self.gene[geneType] = init_rule(self.mf_size_in, self.mf_size_in, self.mf_size_out)
+			rule_mat = copy.deepcopy(self.gene[geneType])
+
+			self.gene[geneType] = mutate_rule(self.mf_size_in, self.mf_size_in, self.mf_size_out, rule_mat, mutation_rand)
 		elif geneType == "input_mf":
+			mf_x = copy.deepcopy(self.gene[geneType][self.x_prefix])
+			mf_y = copy.deepcopy(self.gene[geneType][self.y_prefix])
+
 			self.gene[geneType] = {
-				self.x_prefix : init_mf("x", self.mf_size_in, self.mf_space_in, mutation_rand),
-				self.y_prefix : init_mf("y", self.mf_size_in, self.mf_space_in, mutation_rand),
+				self.x_prefix : mutate_mf(mf_x, mutation_rand),
+				self.y_prefix : mutate_mf(mf_y, mutation_rand)
 			}
 		elif geneType == "output_mf":
+			mf_f = copy.deepcopy(self.gene[geneType][self.f_prefix])
+			print(mf_f)
+
 			self.gene[geneType] = {
-				self.f_prefix : init_mf("f", self.mf_size_out, self.mf_space_out, mutation_rand),
+				self.f_prefix : mutate_mf(mf_f, mutation_rand)
 			}
+			print(self.gene[geneType][self.f_prefix])
 
 
 
