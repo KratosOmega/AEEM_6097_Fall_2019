@@ -144,7 +144,7 @@ class GeneticAlgorithm():
                 # ################################################## backup save Gene
 
                 # ################################################## Convergence Check
-                if abs(self.prev_fitness - currnt_fitness) < 0.0001:
+                if abs(self.prev_fitness - currnt_fitness) < 0.001:
                     self.stop_count += 1
                 else:
                     self.stop_count = 0
@@ -152,18 +152,12 @@ class GeneticAlgorithm():
 
                 self.prev_fitness = currnt_fitness
 
-                for p in self.population:
-                    print(p.fitness)
-                print("")
-
                 # reset new_population
 
-                if self.stop_count > 10:
+                if self.stop_count > 5:
                     if self.mutation_rand == self.mutation_rand_plus:
-                        print("increase mutation_rand_plus")
                         self.mutation_rand_plus = self.mutation_rand * (1 + 0.1)
                     else:
-                        print("reset mutation_rand_plus")
                         self.mutation_rand_plus *= (1 + 0.1)
                     self.stop_count = 0
                 # ################################################## Convergence Check
@@ -211,13 +205,14 @@ class GeneticAlgorithm():
             return population
 
     def crossover(self, parent1 , parent2):
-        ancestors = [parent1, parent2]
+        ancestors1 = [parent1, parent2]
+        ancestors2 = [parent2, parent1]
 
-        child1 = Chromosome(ancestors, self.cog_precision, self.x_prefix, self.y_prefix, self.f_prefix, 
+        child1 = Chromosome(ancestors1, self.cog_precision, self.x_prefix, self.y_prefix, self.f_prefix, 
         self.mf_size_in, self.mf_space_in, self.mf_size_out, self.mf_space_out, 
         self.shuffle_type, self.rand)
 
-        child2 = Chromosome(ancestors, self.cog_precision, self.x_prefix, self.y_prefix, self.f_prefix, 
+        child2 = Chromosome(ancestors2, self.cog_precision, self.x_prefix, self.y_prefix, self.f_prefix, 
         self.mf_size_in, self.mf_space_in, self.mf_size_out, self.mf_space_out, 
         self.shuffle_type, self.rand)
 

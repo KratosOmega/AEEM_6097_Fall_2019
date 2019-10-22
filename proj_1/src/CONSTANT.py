@@ -5,7 +5,7 @@ y_prefix = "Y"
 f_prefix = "F"
 
 # ------------------------------------------ model setup (this affect the model loading funciton)
-M = 20
+M = 10
 dim_size = 2
 dim_space = [-pi, pi]
 train_percent = 0.8
@@ -17,13 +17,13 @@ cog_precision = 0.1 #0.01
 # ------------------------------------------
 
 # ------------------------------------------ training setup
-MaxGen = 300
+MaxGen = 500
 pc = 0.50
 pm = 0.25
-er = 0.2
+er = 0.1
 
 draw_size = 100
-data_size = 200
+data_size = 400
 rand = -1#0.50
 mutation_rand = 0.25
 shuffle_type = "h" # h, v, random

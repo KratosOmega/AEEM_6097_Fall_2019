@@ -110,20 +110,12 @@ def inherit_rule(ancestors, shuffle_type):
 	A = copy.deepcopy(ancestors[0].gene["rule_mat"])
 	B = copy.deepcopy(ancestors[1].gene["rule_mat"])
 
-	if uniform(0, 1) > 0.5:
-		return A
-	else:
-		return B
-
-	"""
-
 	if shuffle_type == "v":
 		return shuffle_v(A, B)
 	elif shuffle_type == "h":
 		return shuffle_h(A, B)
 	elif shuffle_type == "random":
 		return shuffle_random(A, B)
-	"""
 
 def random_draw(data, draw_size):
 	idx = np.random.randint(data.shape[0], size = draw_size)
