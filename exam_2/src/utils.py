@@ -162,6 +162,29 @@ def shuffle_random(A, B):
 				shuffled[r, c] = B[r, c]
 	return shuffled
 
+def self_shuffle(A):
+	orig_dim = A.shape[0]
+	# for exam_2, we remove 1st column and last row
+	# after shuffle, we re-added the 1st col and last row
+	temp_A = A[:, range(1, orig_dim)][range(0, orig_dim - 1), :]
+
+	dim = temp_A.shape[0]
+
+	idx = choice(list(range(1, dim-1))) # skip the 1st and last idex to ensure crossover is done
+
+	top = temp_A[range(idx, dim), :]
+	bot = temp_A[range(0, idx), :]
+
+	crossed = np.concatenate((top, bot), axis=0)
+
+	col_add = np.zeros((dim, 1))
+
+	temp = np.concatenate((col_add, crossed), axis = 1)
+
+	row_add = np.zeros((1, dim+1))
+	final_crossed = np.concatenate((temp, row_add), axis = 0)
+
+	return final_crossed
 
 def generate_data_csv(dim_size, dim_space, data_size, train_percent, output_path = "./_data/"):
 	X_train, X_valid = generate_data(dim_size, dim_space, data_size, train_percent)

@@ -1,124 +1,113 @@
-import random
-from frbs import FRBS
+from random import *
 from utils import *
 from statistics import mean
 from math import *
+import copy
 
 class Chromosome(object):
-	def __init__(self, 
-		ancestors, 
-		cog_precision,
-		x_prefix = "X", y_prefix = "Y", f_prefix = "F", 
-		mf_size_in = 0, mf_space_in = [], mf_size_out = 0, mf_space_out =[], 
-		shuffle_type = "random", rand = -1):
-		#self.target = Target_Function()
-		self.cog_precision = cog_precision
-		self.x_prefix = x_prefix
-		self.y_prefix = y_prefix
-		self.f_prefix = f_prefix
-		self.mf_size_in = mf_size_in
-		self.mf_space_in = mf_space_in
-		self.mf_size_out = mf_size_out
-		self.mf_space_out = mf_space_out
-		self.rand = rand
-		self.shuffle_type = shuffle_type
+	def __init__(self, ancestors = None):
 		self.gene = self.init_gene(ancestors)
 		self.fitness = 0
 		self.normalized_fitness = 0
 
 	def init_gene(self, ancestors):
-		input_mf = {}
-		output_mf = {}
-		rule_mat = {}
+		gene = None
 
-		if ancestors == "empty":
-			return {}
-
-		elif ancestors == None:
-			input_mf = {
-				self.x_prefix : init_mf("x", self.mf_size_in, self.mf_space_in, self.rand),
-				self.y_prefix : init_mf("y", self.mf_size_in, self.mf_space_in, self.rand),
-			}
-
-			output_mf = {
-				self.f_prefix : init_mf("f", self.mf_size_out, self.mf_space_out, self.rand),
-			}
-
-			rule_mat = init_rule(self.mf_size_in, self.mf_size_in, self.mf_size_out)
+		if ancestors == None:
+			gene = self.init_route()
 		else:
-			input_mf = {
-				self.x_prefix : inherit_mf("input_mf", "X", ancestors),
-				self.y_prefix : inherit_mf("input_mf", "Y", ancestors)
-			}
-
-			output_mf = {
-				self.f_prefix : inherit_mf("output_mf", "F", ancestors),
-			}
-
-			rule_mat = inherit_rule(ancestors, self.shuffle_type)
-
-		gene = {
-			"input_mf" : input_mf,
-			"output_mf": output_mf,
-			"rule_mat" : rule_mat,
-		}
+			A = copy.deepcopy(ancestors.gene)
+			gene = self_shuffle(A)
+		
 		return gene
 	
-	def update_fitness(self, X, Y):
-		diff = []
-		input_mf = self.gene["input_mf"]
-		output_mf = self.gene["output_mf"]
-		rule_mat = self.gene["rule_mat"]
+	def update_fitness(self):
+		self.fitness = 0
+		p = 999
+		m = np.array([
+			[0, 5, 0, 20,4, 0, 0, 14, 0],
+			[5, 0, 6, 0, 7, 0, 0, 0, 0],
+			[0, 6, 0, 15, 10, 0, 0, 0, 0],
+			[20, 0, 15, 0, 20, 7, 12, 0, 0],
+			[4, 7, 10, 20, 0, 3, 5, 13, 6],
+			[0, 0, 0, 7, 3, 0, 0, 0, 0],
+			[0, 0, 0, 12, 5, 0, 0, 7, 0],
+			[14, 0, 0, 0, 13, 0, 7, 0, 5],
+			[0, 0, 0, 0, 6, 0, 0, 5, 0],
+			])
+		m_punish = np.array([
+			[p, 5, p, 20,4, p, p, 14, p],
+			[5, p, 6, p, 7, p, p, p, p],
+			[p, 6, p, 15, 10, p, p, p, p],
+			[20, p, 15, p, 20, 7, 12, p, p],
+			[4, 7, 10, 20, p, 3, 5, 13, 6],
+			[p, p, p, 7, 3, p, p, p, p],
+			[p, p, p, 12, 5, p, p, 7, p],
+			[14, p, p, p, 13, p, 7, p, 5],
+			[p, p, p, p, 6, p, p, 5, p],
+			])
 
-		fuzzy = FRBS(input_mf, output_mf, self.cog_precision)
+		m_preset = np.array([
+			[0, 5, 0, 20,4, 0, 0, 14, 0],
+			[0, 0, 6, 0, 7, 0, 0, 0, 0],
+			[0, 6, 0, 15, 10, 0, 0, 0, 0],
+			[0, 0, 15, 0, 20, 7, 12, 0, 0],
+			[0, 7, 10, 20, 0, 3, 5, 13, 6],
+			[0, 0, 0, 7, 3, 0, 0, 0, 0],
+			[0, 0, 0, 12, 5, 0, 0, 7, 0],
+			[0, 0, 0, 0, 13, 0, 7, 0, 5],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0],
+			])
 
-		for i in range(len(X)):
-			x = {
-				self.x_prefix : X[i][0],
-				self.y_prefix : X[i][1],
-			}
+		r = {
+			0 : [1, 3, 4, 7],
+			1 : [0, 2, 4],
+			2 : [1, 3, 4],
+			3 : [0, 2, 4, 5, 6],
+			4 : [0, 1, 2, 3, 5, 6, 7, 8],
+			5 : [3, 4],
+			6 : [3, 4, 7],
+			7 : [0, 4, 6, 8],
+			8 : [4, 7],
+		}
 
-			fuzzified_input = fuzzy.fuzzification(x, fuzzy.input_func_set)
-			evaled_rules = fuzzy.rule_mat_eval(fuzzified_input, rule_mat)
-			crisp = fuzzy.defuzzification(evaled_rules, "F")
+		route_idx = np.where(self.gene == 1)
 
-			# ########################################################## pick one from below for fitness calculation
-			# ---------------------------------------------------------- diff of output only
-			diff.append(abs(crisp - Y[i]))
-			# ----------------------------------------------------------
-			"""
-			# ---------------------------------------------------------- diff of L2 Norm
-			h_l2 = sqrt(X[i][0] * X[i][0] + X[i][1] * X[i][1] + crisp * crisp)
-			t_l2 = sqrt(X[i][0] * X[i][0] + X[i][1] * X[i][1] + Y[i] * Y[i])
-			diff.append(abs(h_l2 - t_l2))
-			# ----------------------------------------------------------
-			"""
-			# ##########################################################
+		for i in range(len(route_idx[0])):
+			distance = m[route_idx[0][i], route_idx[1][i]]
+			if distance == 0:# note: 0 means no route connected, it's BAD
+				self.fitness = 999
+				break
+			else:
+				self.fitness += distance
 
-		avg = mean(diff)
+	def mutate_gene(self):
+		dim = self.gene.shape[0]
 
-		# loop all the data by using frbs
-		self.fitness = avg
+		mutated_idx_1 = 0
+		mutated_idx_2 = 0
 
-	def mutate_gene(self, geneType, mutation_rand):
-		if geneType == "rule_mat":
-			rule_mat = copy.deepcopy(self.gene[geneType])
+		while mutated_idx_1 == mutated_idx_2:
+			mutated_idx_1 = choice(list(range(0, dim-1)))
+			mutated_idx_2 = choice(list(range(0, dim-1)))
 
-			self.gene[geneType] = mutate_rule(self.mf_size_in, self.mf_size_in, self.mf_size_out, rule_mat, mutation_rand)
-		elif geneType == "input_mf":
-			mf_x = copy.deepcopy(self.gene[geneType][self.x_prefix])
-			mf_y = copy.deepcopy(self.gene[geneType][self.y_prefix])
+		temp_1 = copy.deepcopy(self.gene[mutated_idx_1, :])
+		temp_2 = copy.deepcopy(self.gene[mutated_idx_2, :])
 
-			self.gene[geneType] = {
-				self.x_prefix : mutate_mf(mf_x, mutation_rand),
-				self.y_prefix : mutate_mf(mf_y, mutation_rand)
-			}
-		elif geneType == "output_mf":
-			mf_f = copy.deepcopy(self.gene[geneType][self.f_prefix])
-			self.gene[geneType] = {
-				self.f_prefix : mutate_mf(mf_f, mutation_rand)
-			}
+		self.gene[mutated_idx_1] = temp_2
+		self.gene[mutated_idx_2] = temp_1
 
+
+	def init_route(self):
+		gene = np.zeros((9, 9))
+		remaining_well = [1, 2, 3, 4, 5, 6, 7, 8]
+
+		for i in range(0, 9 - 1):
+			next_well = choice(remaining_well)
+			gene[i, next_well] = 1
+			remaining_well.remove(next_well)
+
+		return gene
 
 
 
