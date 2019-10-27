@@ -45,9 +45,9 @@ def print_route():
 
 
 if __name__ == '__main__':
-    #main() # main run()
+    main() # main run()
     #debug() # testing & generate dataset
-    print_route()
+    #print_route()
 
     #show_best_gene()
     #generate_data_csv()

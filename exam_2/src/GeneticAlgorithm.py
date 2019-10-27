@@ -76,6 +76,7 @@ class GeneticAlgorithm():
             self.cgcurve.append(currnt_fitness)
 
             print("fitness --------: ", currnt_fitness)
+            print("route:  --------: ", self.population[0].gene)
 
             # ################################################## backup save Gene
             if g % 5 == 0:
